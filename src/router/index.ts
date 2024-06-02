@@ -1,13 +1,14 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 import LoginView from "../views/LoginView.vue"
+
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
       //路由重定向
       path: '/',
-     redirect:"/login"
+      redirect:"/login"
     },
     {
       path: '/login',
@@ -28,12 +29,51 @@ const router = createRouter({
         {
           path: '/central',
           name: 'central',
+          meta:{
+            title:"控制面板"
+          },
           // route level code-splitting
           // this generates a separate chunk (About.[hash].js) for this route
           // which is lazy-loaded when the route is visited.
-          component: () => import('../views/TestView.vue')
+          component: () => import('../views/CentralView.vue')
         },
-
+        {
+          //
+          path: '/profile',
+          name: 'profile',
+          meta:{
+            title:"个人信息"
+          },
+          
+          component: () => import('../views/ProfileView.vue')
+        },
+        {
+          //
+          path: '/log',
+          name: 'log',
+          meta:{
+            title:"操作日志"
+          },
+          component: () => import('../views/LogView.vue')
+        },
+        {
+          //
+          path: '/product',
+          name: 'product',
+          meta:{
+            title:"商品管理"
+          },
+          component: () => import('../views/ProductView.vue')
+        },
+        {
+          //
+          path: '/order',
+          name: 'order',
+          meta:{
+            title:"订单管理"
+          },
+          component: () => import('../views/OrderView.vue')
+        },
       ]
     },
   

@@ -8,14 +8,21 @@ import {useRouter} from 'vue-router'
 const router = useRouter();
 const select = (e:number) => {
     //选择哪个面板就跳转到那个页面
+    //中控
     if(e ==1){
         router.push('/central')
+        //商品管理
     }else if(e == 2){
-        console.log("value is ",e)
+       router.push("/product")
+       //订单管理
     }else if(e == 3){
-        console.log("value is ",e)
+        router.push("/order")
+        //个人信息
     }else if(e == 4){
-        console.log("value is ",e)
+        router.push("/profile")
+        //日志
+    }else if(e==5){
+        router.push("/log")
     }
    
 }
@@ -24,7 +31,6 @@ const select = (e:number) => {
 <template>
     <div class="warpper">
         <div class="menu"><el-col>
-                <!-- <h5 class="mb-2" style="margin-top: 10px;"></h5> -->
                 <el-menu default-active="1" class="el-menu-vertical-demo" @select="select">
                     <el-menu-item index="1">
                         <el-icon><el-icon>
@@ -34,19 +40,25 @@ const select = (e:number) => {
                     </el-menu-item>
                     <el-menu-item index="2">
                         <el-icon><icon-menu /></el-icon>
-                        <span>客房详情</span>
+                        <span>商品管理</span>
                     </el-menu-item>
                     <el-menu-item index="3">
                         <el-icon>
                             <document />
                         </el-icon>
-                        <span>订单详情</span>
+                        <span>订单管理</span>
                     </el-menu-item>
                     <el-menu-item index="4">
                         <el-icon>
+                            <el-icon><Postcard /></el-icon>
+                        </el-icon>
+                        <span>个人信息</span>
+                    </el-menu-item>
+                    <el-menu-item index="5">
+                        <el-icon>
                             <setting />
                         </el-icon>
-                        <span>更多内容</span>
+                        <span>操作日志</span>
                     </el-menu-item>
                 </el-menu>
             </el-col> </div>
@@ -57,12 +69,13 @@ const select = (e:number) => {
 
 <style scoped>
 .warpper{
+    width: 20%;
     margin-top: 10px;
     display: flex;
 }
-.menu{
+/* .menu{
 width: 10%;
-}
+} */
 
 .showContent{
     width: 70%;

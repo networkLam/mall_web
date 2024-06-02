@@ -2,10 +2,14 @@
 import HeadComponment from '../components/HeadComponment.vue'
 import MenuComponent from '@/components/MenuComponent.vue';
 import {useOnlogin} from '../stores/index'
+import {useRouter} from "vue-router"
 const userName = useOnlogin().getUserName;
+const route = useRouter();
+route.push("/central")
 console.log("%centry home page","color:red;")
-</script>
 
+
+</script>
 <template>
   <!-- 这是根标签 -->
   <div>

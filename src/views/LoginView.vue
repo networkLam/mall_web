@@ -1,6 +1,8 @@
 <script lang="ts" setup>
 // 这是登录界面
 import axios from 'axios'
+import request from '@/utils/request'
+import API from "@/utils/api";
 import { reactive } from 'vue'
 import { useRouter } from "vue-router"
 import { useOnlogin } from "../stores/index"
@@ -18,9 +20,12 @@ function onSubmit() {
     }
     console.log("account and pwd as follows")
     console.log(data)
-    axios.post('/api/administrator/login', data)
-        .then((res) => {
-            console.log(res.status);
+    request({
+        method: 'post',
+        url:API.LOGIN,
+        data
+    }).then(res=>{
+             console.log(res.status);
             console.log(res.data);
             if (res.data.code == "1") {
                 OnLogin.setToken(res.data.data)
@@ -36,14 +41,33 @@ function onSubmit() {
                 }
 
             }
-        })
+    })
+    // axios.post('/api/administrator/login', data)
+    //     .then((res) => {
+    //         console.log(res.status);
+    //         console.log(res.data);
+    //         if (res.data.code == "1") {
+    //             OnLogin.setToken(res.data.data)
+    //             OnLogin.setUserName("admin")
+    //             router.push('/home')
+    //         } else {
+    //             //this tips login error information 
+    //             // alert("login error")
+    //             if (res.data.msg != null) {
+    //                 ElMessage.error(res.data.msg)
+    //             } else {
+    //                 ElMessage.error('账号或密码有误！')
+    //             }
+
+    //         }
+    //     })
 
 }
 
 function forget() {
     router.push('/home')
 }
-</script>    
+</script>
 
 <template>
     <div class="warpper">
@@ -98,7 +122,8 @@ function forget() {
                         <div style="margin-top: 40px;margin-left: 20px;">
                             <el-row class="mb-4">
                                 <el-button type="primary" round @click="onSubmit">登录</el-button>
-                                <span style="margin-left: 22px;"> <el-button round @click="forget">忘记密码</el-button> </span>
+                                <span style="margin-left: 22px;"> <el-button round @click="forget">忘记密码</el-button>
+                                </span>
                             </el-row>
                         </div>
 
@@ -182,4 +207,5 @@ function forget() {
     display: flex;
     background: white;
     width: 85%;
-}</style>
+}
+</style>
