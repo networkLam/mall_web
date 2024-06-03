@@ -10,3 +10,10 @@ export interface UserInfo{
     name:string
     age:number
 }
+
+export interface InfoInf{
+    entry_time: string,
+    gender:string,
+    name:string,
+    phone:string
+}
