@@ -1,12 +1,13 @@
 <script lang="ts" setup>
 // 这是登录界面
-import axios from 'axios'
 import request from '@/utils/request'
 import API from "@/utils/api";
 import { reactive } from 'vue'
 import { useRouter } from "vue-router"
 import { useOnlogin } from "../stores/index"
 import { ElMessage } from 'element-plus'
+import type { Result } from '@/typemanual/typemian';
+import type { AxiosResponse } from 'axios';
 const account_msg = reactive({
     phone: "",
     m_pwd: ""
@@ -18,54 +19,37 @@ function onSubmit() {
         phone: account_msg.phone,
         m_pwd: account_msg.m_pwd
     }
-    console.log("account and pwd as follows")
-    console.log(data)
     request({
         method: 'post',
-        url:API.LOGIN,
+        url: API.LOGIN,
         data
-    }).then(res=>{
-             console.log(res.status);
-            console.log(res.data);
-            if (res.data.code == "1") {
-                OnLogin.setToken(res.data.data)
-                OnLogin.setUserName("admin")
-                router.push('/home')
+    }).then((res: AxiosResponse<Result>) => {
+        // console.log(res.code)
+        console.log(res.data.data);
+        if (res.data.code == "1") {
+            OnLogin.setToken(res.data.data as string)
+            // OnLogin.setUserName("admin")
+            request({
+                url:"/api/administrator/info"
+            }).then(res=>{
+                const {entry_time,gender,name,phone} =  res.data.data;
+                OnLogin.setUserName(name);
+                OnLogin.setSrc(phone)
+            })
+            router.push('/home')
+        } else {
+            //this tips login error information 
+            if (res.data.msg != null) {
+                ElMessage.error(res.data.msg)
             } else {
-                //this tips login error information 
-                // alert("login error")
-                if (res.data.msg != null) {
-                    ElMessage.error(res.data.msg)
-                } else {
-                    ElMessage.error('账号或密码有误！')
-                }
-
+                ElMessage.error(res.data.msg)
             }
+        }
     })
-    // axios.post('/api/administrator/login', data)
-    //     .then((res) => {
-    //         console.log(res.status);
-    //         console.log(res.data);
-    //         if (res.data.code == "1") {
-    //             OnLogin.setToken(res.data.data)
-    //             OnLogin.setUserName("admin")
-    //             router.push('/home')
-    //         } else {
-    //             //this tips login error information 
-    //             // alert("login error")
-    //             if (res.data.msg != null) {
-    //                 ElMessage.error(res.data.msg)
-    //             } else {
-    //                 ElMessage.error('账号或密码有误！')
-    //             }
-
-    //         }
-    //     })
-
 }
 
 function forget() {
-    router.push('/home')
+    ElMessage.error("功能尚未开发！")
 }
 </script>
 

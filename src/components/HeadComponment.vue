@@ -4,7 +4,7 @@ import { InfoFilled } from '@element-plus/icons-vue'
 import {useRouter} from 'vue-router'
 //初始化路由
 const router = useRouter();
-const props = defineProps(['name']);
+const props = defineProps(['name',"src"]);
 // 需要加一个退出按钮
 const confirm = ()=>{
     //when exit  clear  storage  all data
@@ -17,7 +17,7 @@ const cancel = ()=>{
 </script>
 <template>
     <div class="warpper">
-        <div class="head">欢迎 <span style="font-style: italic;">  {{ props.name}}</span>
+        <div class="head">欢迎 <span style="font-style: italic;">  {{ props.name}}</span> <span style="font-style: italic;">  {{ props.src}}</span> 
             <div class="confirm"> <el-popconfirm
                 width="220"
                 confirm-button-text="确定"

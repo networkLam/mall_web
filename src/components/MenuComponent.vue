@@ -62,22 +62,13 @@ const select = (e:number) => {
                     </el-menu-item>
                 </el-menu>
             </el-col> </div>
-            <div class="showContent"><router-view></router-view></div>
-             
+           
     </div>
 </template>   
 
 <style scoped>
 .warpper{
-    width: 20%;
     margin-top: 10px;
-    display: flex;
 }
-/* .menu{
-width: 10%;
-} */
 
-.showContent{
-    width: 70%;
-}
 </style>

@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import {reactive,ref,onMounted,onBeforeMount} from "vue";
 import request from "../utils/request"
+import api from '../utils/api'
 import type { InfoInf } from "../typemanual/typemian";
 const info = reactive<InfoInf>({
   entry_time: "",
@@ -8,17 +9,14 @@ const info = reactive<InfoInf>({
   name: "",
   phone: ""
 })
-onBeforeMount(()=>{
-  request("/api/administrator/info").then(res=>{
+request(api.PROFILE).then(res=>{
       const {entry_time,gender,name,phone} =  res.data.data;
+      // console.log(entry_time)
       info.entry_time = entry_time.split("T")[0];
       info.gender = gender;
       info.name = name;
       info.phone = phone;
-
   })
-})
-
 </script>
 <template>
     <!-- 这是根标签 -->
@@ -86,7 +84,6 @@ text-align: center;
 border-top: 1px solid #FFA89B;
 margin-top: 12px;
 padding: 12px 0 12px 0;
-
 }
 .user_avatar{
     width: 80px;
