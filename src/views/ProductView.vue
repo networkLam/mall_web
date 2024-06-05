@@ -27,7 +27,7 @@
       </el-table-column>
     </el-table>
     <!-- 首页浏览商品信息 -->
-    <div class="pagination"><el-pagination background layout="prev, pager, next" :total="1000"
+    <div class="pagination"><el-pagination background layout="prev, pager, next" :total="page_number" :default-page-size="5"
         v-model:current-page="currentPage" /></div>
     <!-- 自定义弹框 -->
     <el-dialog v-model="dialogTableVisible" title="搜索结果" width="800">
@@ -102,7 +102,7 @@
 import type { ImageProps } from 'element-plus'
 import type {ProductList} from "@/typemanual/typemian"
 import { Search } from '@element-plus/icons-vue'
-import { ref, reactive, onMounted, watchEffect, computed, watch,onBeforeMount } from 'vue';
+import { ref, reactive, onMounted, watchEffect, computed, watch,onBeforeMount,onUpdated } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import request from '@/utils/request';
 import api from "@/utils/api";
@@ -127,9 +127,21 @@ const route = useRoute();
 * 路由实例
 */
 const router = useRouter();
+
+//总条数 / 5 向上取整的就是page number
+let page_number = ref(0);
+
+
 onMounted(() => {
   //console.log('3.-组件挂载到页面之后执行-------onMounted')
+  request(api.PRODUCTCOUNT).then(res=>{
+    // console.log(res.data)
+    page_number.value = Math.ceil( res.data.data) -5;
+    console.log("page_number",page_number.value)
+  })
 })
+
+
 //列表的数据 fake data
 let tableData = reactive<ProductList[]>([{
   time: '',
@@ -151,6 +163,8 @@ watch(currentPage, (newVal, oldVal) => {
     console.log(data)
   })
 })
+
+
 
 
 //编辑函数
