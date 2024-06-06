@@ -7,13 +7,22 @@
     <!-- 首页浏览商品信息 -->
     <el-table :data="tableData" stripe style="width: 100%">
       <el-table-column align="left" label="图片" width="180">
-        <template #default>
-          <el-image style="width: 100px; height: 100px" :src="url" :fit="fits[0]" />
+        <template #default="scope">
+          <el-image style="width: 100px; height: 100px" :src="scope.row.picture_name" :fit="fits[0]" />
         </template>
       </el-table-column>
       <el-table-column prop="time" label="入库日期" width="180" sortable />
       <el-table-column prop="p_name" label="名称" width="180" />
       <el-table-column prop="price" label="价格" width="180" />
+      <el-table-column prop="state" label="状态" width="180" >
+        <template #default="scope">
+        <el-tag
+          :type="scope.row.state === '1' ? 'success' : 'danger'"
+          disable-transitions
+          >{{ scope.row.state }}</el-tag
+        >
+      </template>
+      </el-table-column>
       <el-table-column prop="p_describe" label="描述" width="280" />
       <el-table-column align="right" label="编辑" width="180">
         <template #default="scope">
@@ -40,53 +49,20 @@
     <!-- 点击弹框后的表单 需要复用 添加商品和编辑商品--> 
     <el-dialog v-model="showTable" title="编辑信息" width="800">
       <el-form :model="form" label-width="auto" style="max-width: 600px">
-        <el-form-item label="Activity name">
-          <el-input v-model="form.name" />
+        <el-form-item label="商品名称">
+          <el-input v-model="form.p_name" />
         </el-form-item>
-        <el-form-item label="Activity zone">
-          <el-select v-model="form.region" placeholder="please select your zone">
-            <el-option label="Zone one" value="shanghai" />
-            <el-option label="Zone two" value="beijing" />
+        <el-form-item label="商品价格">
+          <el-input v-model="form.price" />
+        </el-form-item>
+        <el-form-item label="上架状态">
+          <el-select v-model="form.state" placeholder="请选择商品的状态">
+            <el-option label="上架" value="上架" />
+            <el-option label="下架" value="下架" />
           </el-select>
         </el-form-item>
-        <el-form-item label="Activity time">
-          <el-col :span="11">
-            <el-date-picker v-model="form.date1" type="date" placeholder="Pick a date" style="width: 100%" />
-          </el-col>
-          <el-col :span="2" class="text-center">
-            <span class="text-gray-500">-</span>
-          </el-col>
-          <el-col :span="11">
-            <el-time-picker v-model="form.date2" placeholder="Pick a time" style="width: 100%" />
-          </el-col>
-        </el-form-item>
-        <el-form-item label="Instant delivery">
-          <el-switch v-model="form.delivery" />
-        </el-form-item>
-        <el-form-item label="Activity type">
-          <el-checkbox-group v-model="form.type">
-            <el-checkbox value="Online activities" name="type">
-              Online activities
-            </el-checkbox>
-            <el-checkbox value="Promotion activities" name="type">
-              Promotion activities
-            </el-checkbox>
-            <el-checkbox value="Offline activities" name="type">
-              Offline activities
-            </el-checkbox>
-            <el-checkbox value="Simple brand exposure" name="type">
-              Simple brand exposure
-            </el-checkbox>
-          </el-checkbox-group>
-        </el-form-item>
-        <el-form-item label="Resources">
-          <el-radio-group v-model="form.resource">
-            <el-radio value="Sponsor">Sponsor</el-radio>
-            <el-radio value="Venue">Venue</el-radio>
-          </el-radio-group>
-        </el-form-item>
-        <el-form-item label="Activity form">
-          <el-input v-model="form.desc" type="textarea" />
+        <el-form-item label="商品描述">
+          <el-input v-model="form.p_describe" type="textarea" />
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="onSubmit">Create</el-button>
@@ -112,8 +88,6 @@ const fits = [
   'cover',
 ] as ImageProps['fit'][]
 
-const url =
-  'https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg'
 //记录当前的页码
 let currentPage = ref(1)
 
@@ -134,11 +108,7 @@ let page_number = ref(0);
 
 onMounted(() => {
   //console.log('3.-组件挂载到页面之后执行-------onMounted')
-  request(api.PRODUCTCOUNT).then(res=>{
-    // console.log(res.data)
-    page_number.value = Math.ceil( res.data.data) -5;
-    console.log("page_number",page_number.value)
-  })
+
 })
 
 
@@ -153,11 +123,29 @@ let tableData = reactive<ProductList[]>([{
   price: '',
   state: ''
 }]) ;
+
+
+//表单内容
+const form = reactive({
+  pd_id: '',
+  price: '',
+  state: '',
+  p_name: '',
+  p_describe:'',
+  pictrue_name :'',
+  pd_type:'',
+  // delivery: false,
+  // type: [],
+  // resource: '',
+  // desc: '',
+})
+
 watch(currentPage, (newVal, oldVal) => {
   console.log(newVal)
   request(api.PRODUCTQUERY+(currentPage.value*5)).then(res=>{
     const data:ProductList[] = res.data.data;
     data.forEach((item,index)=>{
+      data[index].picture_name = "http://localhost:8080/upload/" + data[index].picture_name;
       tableData[index] = data[index];
     })
     console.log(data)
@@ -168,10 +156,17 @@ watch(currentPage, (newVal, oldVal) => {
 
 
 //编辑函数
-const handleEdit = (index: any, row: { date: any; }) => {
+const handleEdit = (index: any, row:any) => {
+  console.log(row.pd_id)
   console.log(index)
-  console.log(row.date)
   showTable.value = true
+  console.log(tableData[index])
+  form.p_describe = tableData[index].p_describe; //描述
+  form.p_name = tableData[index].p_name; //名称
+  form.pd_type = tableData[index].pd_type; //类型
+  form.price = tableData[index].price; //价格
+  form.state = tableData[index].state;
+
 }
 //删除函数
 const handleDelete = (index: any, row: any) => {
@@ -185,17 +180,7 @@ const searchFun = () => {
   // alert(keyword.value)
   dialogTableVisible.value = true;
 }
-//表单内容
-const form = reactive({
-  name: '',
-  region: '',
-  date1: '',
-  date2: '',
-  delivery: false,
-  type: [],
-  resource: '',
-  desc: '',
-})
+
 //提交表单
 const onSubmit = () => {
   console.log('submit!')
@@ -207,10 +192,18 @@ const addproduct = ()=>{
 
 
 //网络请求 在页面创建之间获取一次数据
-onBeforeMount(()=>{
-  request(api.PRODUCTQUERY+currentPage.value).then(res=>{
+onBeforeMount(async ()=>{
+
+  await request(api.PRODUCTCOUNT).then(res=>{
+    // console.log(res.data)
+    page_number.value = Math.ceil( res.data.data) -5;
+    console.log("page_number",page_number.value)
+  })
+
+  await request(api.PRODUCTQUERY+currentPage.value).then(res=>{
     const data:ProductList[] = res.data.data;
     data.forEach((item,index)=>{
+      data[index].picture_name = "http://localhost:8080/upload/" + data[index].picture_name;
       tableData[index] = data[index];
     })
     console.log(data)

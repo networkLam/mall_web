@@ -17,14 +17,13 @@ console.log("%centry home page","color:red;")
   <!-- 这是根标签 -->
   <div>
     <HeadComponment :name="userName" :src="Link"></HeadComponment>
-    <div  class="content-menu"><MenuComponent></MenuComponent> <div  class="content-right"><router-view></router-view> </div></div>
+    <div  class="content-menu"><MenuComponent></MenuComponent> <div  class="content-right"> <router-view></router-view>  </div></div>
     
   </div>
 </template>
 
 <style scoped lang="less">
 .content-menu{
-  // width: 20%;
   margin-top: 10px;
   display: flex;
 }
