@@ -21,10 +21,13 @@ request.interceptors.response.use((res)=>{
 
 // 响应拦截 intercept 是拦截的意思 后面加 ors表示什么工具（器） 在计算机中
 // request.interceptors.response.use((res:AxiosResponse)=>{
-//     console.log("this respones interceptors print data");
-//         if(res.config.url?.includes("login")){
-//                 localStorage.removeItem("token");
-//         }
+//     // console.log("this respones interceptors print data");
+//     //     if(res.config.url?.includes("login")){
+//     //             localStorage.removeItem("token");
+//     //     }
+//     if(res.code == "ERR_BAD_RESPONSE"){
+//         alert("无网络连接")
+//     }
 //     return res;
 // })
 export default request;

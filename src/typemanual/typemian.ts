@@ -32,5 +32,15 @@ export interface ProductList{
     picture_name : string, //产品图片
     price : string, //产品价格
     state : string, //产品状态
-    time : string, //入库时间
+    time? : string, //入库时间
+}
+
+export interface UserEditForm{
+    pd_id: string,
+  price: string,
+  state: string,
+  p_name: string,
+  p_describe: string,
+  picture_name: string,
+  pd_type: string,
 }
