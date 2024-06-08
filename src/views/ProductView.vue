@@ -18,7 +18,7 @@
       <el-table-column prop="price" label="价格" width="180" />
       <el-table-column prop="state" label="状态" width="180">
         <template #default="scope">
-          <el-tag :type="scope.row.state === '1' ? 'success' : 'danger'" disable-transitions>{{ scope.row.state
+          <el-tag :type="scope.row.state === '上架' ? 'success' : 'danger'" disable-transitions>{{ scope.row.state
             }}</el-tag>
         </template>
       </el-table-column>
@@ -77,30 +77,31 @@
           <el-input v-model="form.p_describe" type="textarea" />
         </el-form-item>
 
-        <el-form-item label="详情图片">
-          <el-icon @click="detail_handle">
+        <el-form-item label="详情图片" v-show="updateOrInsert">
+          <el-icon @click="detail_open">
+            <!-- 点开详情图片的那个＋号 -->
             <Plus />
           </el-icon>
-          <el-dialog v-model="detail_picture_flag" title="Tips" width="500" @close="detail_close">
-            <span>详情图片</span>
+          <el-dialog v-model="detail_picture_flag" title="详情图片" width="500" @close="detail_close" center>
             <template #footer>
-              <el-upload v-model:file-list="details_picture"
-                action="https://run.mocky.io/v3/9d059bf9-4660-45f2-925d-ce80ad6c4d15" list-type="picture-card"
-                :on-preview="detailPicturePreview" :on-remove="detailRemove">
+              <el-upload v-model:file-list="details_picture" accept=".jpg,.jpeg,.png,.avif" action="/api/uploads"
+                name="files" list-type="picture-card" :multiple="true" :on-preview="detailPicturePreview"
+                :on-remove="detailRemove" :on-success="uploadSuccess_detail">
                 <el-icon>
                   <Plus />
                 </el-icon>
               </el-upload>
               <el-dialog v-model="detailsDialogVisible">
-                <img w-full :src="dialogImageUrl" alt="Preview Image" />
+                <img w-full :src="dialogImageUrl" alt="Preview Image" :width="500" :height="500" />
               </el-dialog>
+              <el-button type="primary" class="confirm" @click="confirm_upload">确认</el-button>
             </template>
           </el-dialog>
         </el-form-item>
 
         <el-form-item>
-          <el-button type="primary" @click="onSubmit">Create</el-button>
-          <el-button>Cancel</el-button>
+          <el-button type="primary" @click="onSubmit">确定</el-button>
+          <el-button>取消</el-button>
         </el-form-item>
       </el-form>
     </el-dialog>
@@ -110,12 +111,16 @@
 
 <script lang="ts" setup>
 import type { ImageProps, UploadProps, UploadUserFile } from 'element-plus'
-import type { ProductList,UserEditForm } from "@/typemanual/typemian"
+import type { ProductList, UserEditForm, PictureDetail } from "@/typemanual/typemian"
 import { Search, Plus } from '@element-plus/icons-vue'
 import { ref, reactive, onMounted, watchEffect, computed, watch, onBeforeMount, onUpdated } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import request from '@/utils/request';
 import api from "@/utils/api";
+//判断是新增还是更新
+let updateOrInsert = ref(false);
+
+//搜索弹窗
 const search_dialog = ref(false)
 //是否展示详情图片对话框
 let detail_picture_flag = ref(false);
@@ -124,10 +129,10 @@ const fits = [
   'cover',
 ] as ImageProps['fit'][]
 
-//记录当前的页码
+//记录当前的页码 this hava bug
 let currentPage = ref(1)
 
-//表单是否展示
+//大表单是否展示
 const showTable = ref(false)
 /**
 * 路由对象
@@ -145,7 +150,7 @@ let page_number = ref(0);
 let flag = ref(true)
 
 
-//列表的数据 fake data
+//列表的数据 table data
 let tableData = reactive<ProductList[]>([{
   time: '',
   p_name: '',
@@ -192,13 +197,17 @@ const handlePictureCardPreview: UploadProps['onPreview'] = (uploadFile) => {
 
 watch(currentPage, (newVal, oldVal) => {
   // console.log(newVal)
-  request(api.PRODUCTQUERY + (currentPage.value * 5)).then(res => {
+  //此处有bug 数据应该从0开始
+  let offset = newVal === 0 || oldVal === undefined ? 0 : newVal * 5;
+  // (currentPage.value * 5)
+  request(api.PRODUCTQUERY + offset).then(res => {
     const data: ProductList[] = res.data.data;
+    //先把列表置空，免得出现诡异的事情
+    tableData.length = 0;
     data.forEach((item, index) => {
       data[index].picture_name = "http://localhost:8080/upload/" + data[index].picture_name;
       tableData[index] = data[index];
     })
-
   })
 })
 
@@ -209,37 +218,25 @@ const handleEdit = (index: any, row: any) => {
   form.p_name = tableData[index].p_name; //名称
   form.pd_type = tableData[index].pd_type; //类型
   form.price = tableData[index].price; //价格
-  form.state = tableData[index].state;
-  // console.log("each every do...")
+  form.state = tableData[index].state;//状态
+  form.pd_id = tableData[index].pd_id//商品id
+  form.picture_name = tableData[index].picture_name //图片链接
   const obj = reactive({ name: tableData[index].pd_id, url: tableData[index].picture_name })
   single_file.value.push(obj)
+  updateOrInsert.value = true; // 是更新
 }
 //详情页面图片的预览
 const detailsDialogVisible = ref(false)
 
 //详情页面的图片对象
 const details_picture = ref<UploadUserFile[]>([
-  {
-    name: 'food1.jpeg',
-    url: 'https://fuss10.elemecdn.com/3/63/4e7f3a15429bfda99bce42a18cdd1jpeg.jpeg?imageMogr2/thumbnail/360x360/format/webp/quality/100',
-  },
-  {
-    name: 'food2.jpeg',
-    url: 'https://fuss10.elemecdn.com/3/63/4e7f3a15429bfda99bce42a18cdd1jpeg.jpeg?imageMogr2/thumbnail/360x360/format/webp/quality/100',
-  },
-
-  {
-    name: 'food3.jpeg',
-    url: 'https://fuss10.elemecdn.com/3/63/4e7f3a15429bfda99bce42a18cdd1jpeg.jpeg?imageMogr2/thumbnail/360x360/format/webp/quality/100',
-  },
-
-  {
-    name: 'food4.jpeg',
-    url: 'https://fuss10.elemecdn.com/3/63/4e7f3a15429bfda99bce42a18cdd1jpeg.jpeg?imageMogr2/thumbnail/360x360/format/webp/quality/100',
-  },
+  // {
+  //   name: 'food1.jpeg',
+  //   url: 'https://fuss10.elemecdn.com/3/63/4e7f3a15429bfda99bce42a18cdd1jpeg.jpeg?imageMogr2/thumbnail/360x360/format/webp/quality/100',
+  // },
 ])
-
-
+//上传成功后返回的新数据
+const details_picture_new: Array<string> = [];
 //删除函数
 const handleDelete = (index: any, row: any) => {
   console.log(index)
@@ -256,18 +253,56 @@ const searchFun = () => {
 
 //提交表单
 const onSubmit = () => {
-  console.log('submit!')
-  console.log(single_file)
-  if (single_file.value.length != 1) {
-    console.log("限制提交")
+  if (updateOrInsert.value == false) {
+    //更新
+    // console.log("是新增")
+    if (single_file.value.length == 1) {
+      // console.log('submit!')
+      // console.log(form)
+      const product = { ...form }
+      product.picture_name = product.picture_name.split("/")[4];
+      console.log(product);
+      request({
+        method: "post",
+        data: product,
+        url:api.ADDPRODUCTINFO
+      }).then(res=>{
+        console.log("添加成功",res);
+        showTable.value = false;
+      }).catch(err=>{
+        console.log("添加失败",err)
+      })
+    } else {
+      console.log("限制提交")
+    }
+  } else {
+    // console.log("是更新")
+    if (single_file.value.length == 1) {
+      // console.log('submit!')
+      // console.log(form)
+      const product = { ...form }
+      product.picture_name = product.picture_name.split("/")[4];
+      // console.log(product);
+      request({
+        method: "post",
+        data: product,
+        url: api.UPDATEPRODUCTINFO
+      }).then(res => { console.log("更新成功", res); showTable.value = false; }).catch(err => console.log("更新失败", err))
+
+    } else {
+      console.log("限制提交")
+    }
   }
+
+
 }
 //添加
 const addproduct = () => {
   showTable.value = true;
-  (Object.keys(form) as (keyof typeof form)[]).forEach((key) => {  
-        form[key] = "";  
-});
+  (Object.keys(form) as (keyof typeof form)[]).forEach((key) => {
+    form[key] = "";
+  });
+  updateOrInsert.value = false; //是新增
 }
 
 
@@ -278,7 +313,7 @@ onBeforeMount(async () => {
     page_number.value = Math.ceil(res.data.data) - 5;
     // console.log("page_number", page_number.value)
   })
-  await request(api.PRODUCTQUERY + currentPage.value).then(res => {
+  await request(api.PRODUCTQUERY + 0).then(res => {
     const data: ProductList[] = res.data.data;
     data.forEach((item, index) => {
       data[index].picture_name = "http://localhost:8080/upload/" + data[index].picture_name;
@@ -296,35 +331,94 @@ onMounted(() => {
 const big_dialog = () => {
   single_file.value.pop();
 }
+
 //文件上传成功的回调
 const uploadSuccess = (res: any) => {
   //获取后端返回的数据 http://localhost:8080/upload/139fc4f6-13e6-4cec-b6a2-8b421e07c916.png
   console.log(res)
-  console.log(single_file.value.length);
+  single_file.value.length = 0;
+  const obj = { name: "temp", url: res };
+  single_file.value.push(obj)
   console.log(single_file)
+  form.picture_name = res;
 }
-//详情图片的触发函数
-const detail_handle = () => {
+
+//点击详情图片的按个加号
+const detail_open = () => {
   detail_picture_flag.value = true;
+  //get way picture of detail
+  request(api.GETPICTUREDETAIL + "?pd_id=" + form.pd_id).then(res => {
+    // console.log(res)
+    //check if the data returned by the server is empty
+    const data: Array<PictureDetail> = res.data.data;
+    if (data.length == 0) {
+      console.log("无数据");
+    } else {
+      console.log(data)
+      data.forEach((item, index) => {
+        console.log(data[index].pt_id)
+        console.log(data[index].pt_path)
+        let url = "http://localhost:8080/upload/" + data[index].pt_path;
+        const obj = reactive({ name: data[index].pt_id, url })
+        details_picture.value.push(obj)
+      })
+    }
+  })
 }
 
 //详情图片的触发函数关闭函数
 const detail_close = () => {
   detail_picture_flag.value = false;
+  //清空新上传的文件数据
+  details_picture_new.length = 0;
+  //让预览的链接置空
+  details_picture.value.length = 0;
 }
+
 //详情图片页面的预览
 const detailPicturePreview: UploadProps['onPreview'] = (uploadFile) => {
   dialogImageUrl.value = uploadFile.url!
   detailsDialogVisible.value = true;
 }
+
 //详情图片页面的删除（图片）函数
 const detailRemove: UploadProps['onRemove'] = (uploadFile, uploadFiles) => {
-  console.log("下列是产品详细图片的删除数据（由detailRemove触发）")
-  console.log(uploadFile, uploadFiles)
-
+  // console.log("下列是产品详细图片的删除数据（由detailRemove触发）")
+  // console.log(uploadFile, uploadFiles)
+  console.log(uploadFile.name + "be deleted")
+  request(api.DELETEDETAILPICTURE + "?pt_id=" + uploadFile.name).then(res => {
+    console.log("删除成功", res)
+  }).catch(err => {
+    console.log("删除失败", err)
+  })
 }
 
+//图片详情页面-上传图片成功后的回调函数
+const uploadSuccess_detail = (res: any) => {
+  console.log("picture uploaded success")
+  //每上传成功一张就调用一次（each uploaded success one picture be callback once
+  console.log(res);
+  details_picture_new.push(res.data[0])
+  console.log(details_picture_new);
+}
 
+const confirm_upload = () => {
+  // 确定上传 将数据打包发往服务器
+  const pictures = {
+    pd_id: "",
+    pictures: ['']
+  }
+  pictures.pictures = details_picture_new;
+  pictures.pd_id = form.pd_id;
+  console.log(pictures)
+  request({
+    method: "post",
+    url: api.UPLOADSFILE,
+    data: pictures
+  }).then(res => { console.log(res) }).catch(err => {
+    console.log(err);
+  })
+}
 
 
 </script>
@@ -348,6 +442,7 @@ const detailRemove: UploadProps['onRemove'] = (uploadFile, uploadFiles) => {
 
 .pagination {
   margin-top: 40px;
+  margin-bottom: 40px;
 }
 
 .demo-image .block {
@@ -369,5 +464,9 @@ const detailRemove: UploadProps['onRemove'] = (uploadFile, uploadFiles) => {
   color: var(--el-text-color-secondary);
   font-size: 14px;
   margin-bottom: 20px;
+}
+
+.confirm {
+  margin-top: 10px;
 }
 </style>

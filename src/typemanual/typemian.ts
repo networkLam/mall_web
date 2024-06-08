@@ -44,3 +44,10 @@ export interface UserEditForm{
   picture_name: string,
   pd_type: string,
 }
+
+//详情图片返回的数据
+export interface PictureDetail {
+    pt_id:string; //详情图片数据库的主键
+     pt_path:string; //图片路径
+    pd_id:string ; //绑定的商品id
+}
