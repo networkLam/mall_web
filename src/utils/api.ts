@@ -8,4 +8,6 @@ export default {
     DELETEDETAILPICTURE:"/api/delete/picture",//删除详情页图片数据
     UPDATEPRODUCTINFO:"/api/product/update",//更新商品信息
     ADDPRODUCTINFO:"/api/product/add",//添加商品信息
+    ORDERLIST:"/api/order",//获取不同状态的订单数据
+    
 }

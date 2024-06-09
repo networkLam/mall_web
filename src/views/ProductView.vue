@@ -10,10 +10,11 @@
     <el-table :data="tableData" stripe style="width: 100%">
       <el-table-column align="left" label="图片" width="180">
         <template #default="scope">
+          <!-- style="width: 100px; height: 100px"  -->
           <el-image style="width: 100px; height: 100px" :src="scope.row.picture_name" :fit="fits[0]" />
         </template>
       </el-table-column>
-      <el-table-column prop="time" label="入库日期" width="180" sortable />
+      <el-table-column prop="time" label="入库日期" width="180" />
       <el-table-column prop="p_name" label="名称" width="180" />
       <el-table-column prop="price" label="价格" width="180" />
       <el-table-column prop="state" label="状态" width="180">
@@ -69,7 +70,7 @@
             </el-icon>
           </el-upload>
           <el-dialog v-model="dialogVisible">
-            <img w-full :src="dialogImageUrl" alt="Preview Image" />
+            <img w-full :width="500" :height="500" :src="dialogImageUrl" alt="Preview Image" />
           </el-dialog>
         </el-form-item>
 
@@ -112,6 +113,7 @@
 <script lang="ts" setup>
 import type { ImageProps, UploadProps, UploadUserFile } from 'element-plus'
 import type { ProductList, UserEditForm, PictureDetail } from "@/typemanual/typemian"
+import { ElNotification } from 'element-plus'
 import { Search, Plus } from '@element-plus/icons-vue'
 import { ref, reactive, onMounted, watchEffect, computed, watch, onBeforeMount, onUpdated } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
@@ -172,13 +174,13 @@ const form = reactive<UserEditForm>({
   p_describe: '',
   picture_name: '',
   pd_type: '',
+  time: ""
 })
 
 // 编辑框里面的图片
-
 const single_file = ref<UploadUserFile[]>([
 ])
-
+//预览图片的链接
 const dialogImageUrl = ref('')
 const dialogVisible = ref(false)
 
@@ -198,7 +200,14 @@ const handlePictureCardPreview: UploadProps['onPreview'] = (uploadFile) => {
 watch(currentPage, (newVal, oldVal) => {
   // console.log(newVal)
   //此处有bug 数据应该从0开始
-  let offset = newVal === 0 || oldVal === undefined ? 0 : newVal * 5;
+  //let offset = newVal === 0 || oldVal === undefined ? 0 : newVal * 5;
+  let offset;
+  if (currentPage.value == 1) {
+    offset = 0;
+  } else {
+    offset = (newVal - 1) * 5;
+  }
+  console.log("offset is ", offset)
   // (currentPage.value * 5)
   request(api.PRODUCTQUERY + offset).then(res => {
     const data: ProductList[] = res.data.data;
@@ -221,6 +230,7 @@ const handleEdit = (index: any, row: any) => {
   form.state = tableData[index].state;//状态
   form.pd_id = tableData[index].pd_id//商品id
   form.picture_name = tableData[index].picture_name //图片链接
+  form.time = tableData[index].time;//入库时间
   const obj = reactive({ name: tableData[index].pd_id, url: tableData[index].picture_name })
   single_file.value.push(obj)
   updateOrInsert.value = true; // 是更新
@@ -251,10 +261,25 @@ const searchFun = () => {
   search_dialog.value = true;
 }
 
+//更新页面(添加的成功的时候调用)
+const updatePage = async () => {
+  await request(api.PRODUCTCOUNT).then(res => {
+    //设定页码
+    page_number.value = Math.ceil(res.data.data);
+    // console.log("page_number", page_number.value)
+  })
+  await request(api.PRODUCTQUERY + 0).then(res => {
+    const data: ProductList[] = res.data.data;
+    data.forEach((item, index) => {
+      data[index].picture_name = "http://localhost:8080/upload/" + data[index].picture_name;
+      tableData[index] = data[index];
+    })
+  })
+}
+
 //提交表单
 const onSubmit = () => {
   if (updateOrInsert.value == false) {
-    //更新
     // console.log("是新增")
     if (single_file.value.length == 1) {
       // console.log('submit!')
@@ -265,12 +290,24 @@ const onSubmit = () => {
       request({
         method: "post",
         data: product,
-        url:api.ADDPRODUCTINFO
-      }).then(res=>{
-        console.log("添加成功",res);
+        url: api.ADDPRODUCTINFO
+      }).then(res => {
+        console.log("添加成功", res);
         showTable.value = false;
-      }).catch(err=>{
-        console.log("添加失败",err)
+        ElNotification({
+          title: '完成',
+          message: '添加成功',
+          type: 'success',
+        })
+        //更新成功后刷新一下页面
+        updatePage();
+      }).catch(err => {
+        console.log("添加失败", err)
+        ElNotification({
+          title: '失败',
+          message: '添加失败',
+          type: 'error',
+        })
       })
     } else {
       console.log("限制提交")
@@ -278,17 +315,37 @@ const onSubmit = () => {
   } else {
     // console.log("是更新")
     if (single_file.value.length == 1) {
-      // console.log('submit!')
-      // console.log(form)
       const product = { ...form }
       product.picture_name = product.picture_name.split("/")[4];
-      // console.log(product);
+      const id = product.pd_id;
+
       request({
         method: "post",
         data: product,
         url: api.UPDATEPRODUCTINFO
-      }).then(res => { console.log("更新成功", res); showTable.value = false; }).catch(err => console.log("更新失败", err))
+      }).then(res => {
+        console.log("更新成功", res);
+        tableData.forEach((item, index) => {
+          if (item.pd_id == id) {
+            tableData[index] = { ...product }
+            tableData[index].picture_name = "http://localhost:8080/upload/" + tableData[index].picture_name;
+          }
+        })
+        showTable.value = false;
+        ElNotification({
+          title: '完成',
+          message: '更新成功',
+          type: 'success',
+        })
+      }).catch(err => {
+        console.log("更新失败", err)
 
+        ElNotification({
+          title: '失败',
+          message: '更新失败',
+          type: 'error',
+        })
+      })
     } else {
       console.log("限制提交")
     }
@@ -310,7 +367,7 @@ const addproduct = () => {
 onBeforeMount(async () => {
   await request(api.PRODUCTCOUNT).then(res => {
     //设定页码
-    page_number.value = Math.ceil(res.data.data) - 5;
+    page_number.value = Math.ceil(res.data.data);
     // console.log("page_number", page_number.value)
   })
   await request(api.PRODUCTQUERY + 0).then(res => {
@@ -326,6 +383,7 @@ onMounted(() => {
   //console.log('3.-组件挂载到页面之后执行-------onMounted')
 
 })
+
 
 //关闭弹窗的函数(关闭弹窗时把图片数组中的数据清空)
 const big_dialog = () => {
@@ -388,6 +446,13 @@ const detailRemove: UploadProps['onRemove'] = (uploadFile, uploadFiles) => {
   console.log(uploadFile.name + "be deleted")
   request(api.DELETEDETAILPICTURE + "?pt_id=" + uploadFile.name).then(res => {
     console.log("删除成功", res)
+    //删除详情图片成功的提示
+    ElNotification({
+      title: '完成',
+      message: '删除成功',
+      type: 'success',
+    })
+
   }).catch(err => {
     console.log("删除失败", err)
   })
@@ -411,11 +476,28 @@ const confirm_upload = () => {
   pictures.pictures = details_picture_new;
   pictures.pd_id = form.pd_id;
   console.log(pictures)
+  if(!(pictures.pictures.length >= 1)){
+    //详情图片的长度为0
+    ElNotification({
+      title: '失败',
+      message: '无新数据上传',
+      type: 'error',
+    })
+    return;
+  }
   request({
     method: "post",
     url: api.UPLOADSFILE,
     data: pictures
-  }).then(res => { console.log(res) }).catch(err => {
+  }).then(res => {
+    console.log(res);
+    ElNotification({
+      title: '完成',
+      message: '上传成功',
+      type: 'success',
+    })
+    detail_picture_flag.value = false;
+  }).catch(err => {
     console.log(err);
   })
 }
