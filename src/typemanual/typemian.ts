@@ -65,5 +65,5 @@ export interface OrderList {
   phone: string //联系人手机
   state: string //订单状态
   time: string //时间
-  uid: string //用户id（即是那位用户购买的）
+  uid?: string //用户id（即是那位用户购买的）
 }

@@ -9,5 +9,6 @@ export default {
     UPDATEPRODUCTINFO:"/api/product/update",//更新商品信息
     ADDPRODUCTINFO:"/api/product/add",//添加商品信息
     ORDERLIST:"/api/order",//获取不同状态的订单数据
+    ORDERCOUNT:"/api/order/count",//获取不同状态订单的数量（总数
     
 }
