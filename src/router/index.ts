@@ -74,6 +74,15 @@ const router = createRouter({
           },
           component: () => import('../views/OrderView.vue')
         },
+        {
+          //
+          path: '/user',
+          name: 'user',
+          meta:{
+            title:"用户管理"
+          },
+          component: () => import('../views/UserView.vue')
+        },
       ]
     },
   

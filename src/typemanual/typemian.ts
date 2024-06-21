@@ -55,7 +55,7 @@ export interface PictureDetail {
 
 export interface OrderList {
   add_id: string //地址id
-  address: string//地址
+  address: string //地址
   amount: string //数量
   contacts: string //联系人
   exp_id: string //快递编号
@@ -66,4 +66,37 @@ export interface OrderList {
   state: string //订单状态
   time: string //时间
   uid?: string //用户id（即是那位用户购买的）
+}
+//详细列表的数据
+export interface DetailList {
+  number: number //数量（买了多少个
+  totals: string //总价（一共多少钱
+  url: string //图片地址
+  describe: string //商品描述
+  pd_id :number //产品id
+}
+//查询商品的详细数据时候返回的数据（即订单中所包含的商品
+export interface OrderDetails {
+  id: number
+  number: number
+  order_id: number
+  pd_id: number
+  totals: string
+
+}
+
+//日志列表需要用到的数据
+export interface LogInfoShow{
+  name:string,//管理员姓名
+  action:string, //动作
+  target:string,//动作的对象
+  time:string, //发生的时间
+}
+//用户信息结构
+export interface User{
+  uid:number,
+  phone:string,
+  user_name:string,
+  gender:string,
+  register_time:string
 }

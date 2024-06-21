@@ -23,6 +23,8 @@ const select = (e:number) => {
         //日志
     }else if(e==5){
         router.push("/log")
+    }else if(e == 6){
+        router.push("/user")
     }
    
 }
@@ -49,9 +51,9 @@ const select = (e:number) => {
                         <span>订单管理</span>
                     </el-menu-item>
                     <el-menu-item index="4">
-                        <el-icon>
+                       
                             <el-icon><Postcard /></el-icon>
-                        </el-icon>
+                        
                         <span>个人信息</span>
                     </el-menu-item>
                     <el-menu-item index="5">
@@ -59,6 +61,10 @@ const select = (e:number) => {
                             <setting />
                         </el-icon>
                         <span>操作日志</span>
+                    </el-menu-item>
+                    <el-menu-item index="6">
+                        <el-icon><EditPen /></el-icon>
+                        <span>用户管理</span>
                     </el-menu-item>
                 </el-menu>
             </el-col> </div>

@@ -6,7 +6,7 @@
     </div>
     <div class="text">
        <div class="desc">{{ props.describe }}</div>
-       <div class="amount"> <div class="left"><span> {{ "$"+props.price }}</span>&nbsp;&nbsp;&nbsp;<span>{{ "x"+props.amount }}</span> </div>  </div>
+       <div class="amount"> <div class="left"><span> {{ "x"+props.amount  }}</span>&nbsp;&nbsp;&nbsp;<span>{{ "￥"+props.price }}</span> </div>  </div>
     </div>
 
   </div>

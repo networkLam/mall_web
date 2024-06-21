@@ -3,7 +3,7 @@
 <template>
     <!-- 这是根标签 -->
     <div class="wrapper">   
-       <span>内容</span>
+       <h2>暂无内容</h2>
     </div>
   </template>
 <style scoped> 

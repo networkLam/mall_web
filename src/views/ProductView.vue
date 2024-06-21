@@ -105,8 +105,25 @@
           <el-button>取消</el-button>
         </el-form-item>
       </el-form>
-    </el-dialog>
+    </el-dialog>   
     <!-- 表单结束 -->
+<!-- 确认删除的弹窗 -->
+    <el-dialog
+    v-model="confirm_dialog"
+    title="警告"
+    width="500"
+  >
+    <span>确认删除吗？</span>
+    <template #footer>
+      <div class="dialog-footer">
+        <el-button @click="confirm_dialog = false">取消</el-button>
+        <el-button type="primary" @click="delete_func">
+          确认
+        </el-button>
+      </div>
+    </template>
+  </el-dialog>
+ 
   </div>
 </template>
 
@@ -115,8 +132,7 @@ import type { ImageProps, UploadProps, UploadUserFile } from 'element-plus'
 import type { ProductList, UserEditForm, PictureDetail } from "@/typemanual/typemian"
 import { ElNotification } from 'element-plus'
 import { Search, Plus } from '@element-plus/icons-vue'
-import { ref, reactive, onMounted, watchEffect, computed, watch, onBeforeMount, onUpdated } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
+import { ref, reactive, onMounted, watch, onBeforeMount } from 'vue';
 import request from '@/utils/request';
 import api from "@/utils/api";
 //判断是新增还是更新
@@ -136,21 +152,12 @@ let currentPage = ref(1)
 
 //大表单是否展示
 const showTable = ref(false)
-/**
-* 路由对象
-*/
-const route = useRoute();
-/**
-* 路由实例
-*/
-const router = useRouter();
 
 //总条数 / 5 向上取整的就是page number
 let page_number = ref(0);
 
 //record upload function status
 let flag = ref(true)
-
 
 //列表的数据 table data
 let tableData = reactive<ProductList[]>([{
@@ -183,6 +190,7 @@ const single_file = ref<UploadUserFile[]>([
 //预览图片的链接
 const dialogImageUrl = ref('')
 const dialogVisible = ref(false)
+
 
 const handleRemove: UploadProps['onRemove'] = (uploadFile, uploadFiles) => {
   //点击图片删除时
@@ -238,6 +246,9 @@ const handleEdit = (index: any, row: any) => {
 //详情页面图片的预览
 const detailsDialogVisible = ref(false)
 
+let delete_index = 0;
+let delelte_pd_id:string = '';
+let confirm_dialog = ref(false) //确认删除展示弹窗
 //详情页面的图片对象
 const details_picture = ref<UploadUserFile[]>([
   // {
@@ -247,10 +258,37 @@ const details_picture = ref<UploadUserFile[]>([
 ])
 //上传成功后返回的新数据
 const details_picture_new: Array<string> = [];
-//删除函数
+
+const delete_func = ()=>{
+  //真正的删除函数
+  request("/api/product/del?pd_id="+delelte_pd_id).then(res=>{
+    console.log(res);
+    tableData.splice(delete_index,1);
+    confirm_dialog.value = false;
+
+    ElNotification({
+      title: '完成',
+      message: '删除成功',
+      type: 'success',
+    })
+
+  })
+}
+
+//删除函数从数据表格中
 const handleDelete = (index: any, row: any) => {
   console.log(index)
-
+  console.log("delete ?")
+  const id = tableData[index].pd_id;
+  delete_index  = index; //获取当前商品的在数组中索引位置
+  delelte_pd_id = id; //获取删除的商品id
+  confirm_dialog.value = true;
+  console.log(delete_index,delelte_pd_id)
+  // request("/api/product/del?pd_id="+id).then(res=>{
+  //   console.log(res);
+  //   tableData.splice(index,1);
+  // })
+  // console.log(tableData)
 }
 
 //搜索
