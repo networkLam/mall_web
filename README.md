@@ -1,3 +1,33 @@
+# 管理员登录界面 <br>
+
+![admin_login](https://github.com/networkLam/mall_web/assets/78193327/f86aaeb8-903c-48d9-8a66-3f00eb6ae320) <br>
+
+# 管理员添加商品界面 <br>
+![add_product](https://github.com/networkLam/mall_web/assets/78193327/6dc563d9-f4a1-4442-9ccc-707890d744b6) <br>
+
+# 管理员查看订单&处理订单界面 <br>
+
+![show_order](https://github.com/networkLam/mall_web/assets/78193327/34224837-dada-49b6-816b-5ebd3735170d) <br>
+
+![showOder2](https://github.com/networkLam/mall_web/assets/78193327/50b4df42-9d82-4760-b25e-a228b6d1739c) <br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## 以下为项目启动介绍
 # vue-project
 
 This template should help get you started developing with Vue 3 in Vite.
