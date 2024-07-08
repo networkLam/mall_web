@@ -2,6 +2,9 @@
 
 ![admin_login](https://github.com/networkLam/mall_web/assets/78193327/f86aaeb8-903c-48d9-8a66-3f00eb6ae320) <br>
 
+# 数据展示区域
+![image](https://github.com/networkLam/mall_web/assets/78193327/6668125d-e1c2-4966-a6cd-366006ece88e) <br>
+
 # 管理员添加商品界面 <br>
 ![add_product](https://github.com/networkLam/mall_web/assets/78193327/6dc563d9-f4a1-4442-9ccc-707890d744b6) <br>
 
