@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>read and write of file test</title>
+</head>
+<body>
+    <input type="button" onclick="readFile()" value="open file">
+</body>
+
+<script lang="js">
+async function readFile(){
+    try{
+    const [fileHandle] = await window.showOpenFilePicker();
+    console.log(fileHandle)
+    readFromFile(fileHandle);
+    }catch(error){
+        console.warn('文件选择被取消', error);
+    }
+}
+
+// handle就是上面拿到的文件句柄
+async function readFromFile(handle) {
+  const file = await handle.getFile();
+  const content = await file.text();
+  console.log(content)
+  // content 就是文件内容啦！展示给用户，或做些其他花活吧！
+}
+
+</script>
+</html>

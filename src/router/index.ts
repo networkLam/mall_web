@@ -1,7 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 import LoginView from "../views/LoginView.vue"
-
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -9,6 +8,11 @@ const router = createRouter({
       //路由重定向
       path: '/',
       redirect:"/login"
+    },
+    {
+      path:"/testview",
+      name:"testview",
+      component:()=>import('../views/TestView.vue')
     },
     {
       path: '/login',
@@ -85,7 +89,6 @@ const router = createRouter({
         },
       ]
     },
-  
   ]
 })
 

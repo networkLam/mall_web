@@ -4,77 +4,76 @@ import {
     Menu as IconMenu,
     Setting,
 } from '@element-plus/icons-vue'
-import {useRouter} from 'vue-router'
+import { useNavigationTab } from "../stores/navigation"
+import { useRouter, type RouteRecordRaw } from 'vue-router'
+import { ref, type Ref } from 'vue';
 const router = useRouter();
-const select = (e:number) => {
-    //选择哪个面板就跳转到那个页面
-    //中控
-    if(e ==1){
-        router.push('/central')
-        //商品管理
-    }else if(e == 2){
-       router.push("/product")
-       //订单管理
-    }else if(e == 3){
-        router.push("/order")
-        //个人信息
-    }else if(e == 4){
-        router.push("/profile")
-        //日志
-    }else if(e==5){
-        router.push("/log")
-    }else if(e == 6){
-        router.push("/user")
+const tabs = useNavigationTab();
+
+// const routerInfo = router.getRoutes();
+// console.log(routerInfo)
+// console.log('router =',router)
+const routerInfoAll = router.options.routes;
+//返回home路由所在的索引位置
+function matchHomePath(routerInfo: readonly RouteRecordRaw[]): number {
+    for (let i = 0; i < routerInfo.length; i++) {
+        if (routerInfo[i].path === '/home') {
+            return i;
+        }
     }
-   
+    return -1;
 }
-</script>    
+
+//找出找出home路由下面的子路由
+function findChildren(routerInfo: readonly RouteRecordRaw[]): Ref<any[]> {
+    const res = ref<any[]>([]);
+    const index = matchHomePath(routerInfo);
+    //确保存在children属性
+    if (index != -1 && routerInfo[index].children) {
+        for (let i = 0; i < routerInfo[index].children?.length; i++) {
+            // console.log(routerInfo[index].children[i]);
+            res.value.push(routerInfo[index].children[i])
+        }
+    }
+    return res;
+}
+const childrenRouter = findChildren(routerInfoAll)
+// console.log('test = ', childrenRouter)
+
+//路由导航
+const routeChange = (toAnywhere: RouteRecordRaw) => {
+    console.log(toAnywhere)
+    router.push(toAnywhere.path)
+    //实现tab标签导航
+    if (toAnywhere.meta) {
+        const temp = {
+            title: typeof toAnywhere.meta.title === 'string' ? toAnywhere.meta.title : '默认标题',
+            router: toAnywhere.path
+        };
+        tabs.setNavigation(temp);
+    }
+}
+
+</script>
 
 <template>
     <div class="warpper">
-        <div class="menu"><el-col>
-                <el-menu default-active="1" class="el-menu-vertical-demo" @select="select">
-                    <el-menu-item index="1">
-                        <el-icon><el-icon>
-                                <PieChart />
-                            </el-icon></el-icon>
-                        <span>中控平台</span>
-                    </el-menu-item>
-                    <el-menu-item index="2">
-                        <el-icon><icon-menu /></el-icon>
-                        <span>商品管理</span>
-                    </el-menu-item>
-                    <el-menu-item index="3">
-                        <el-icon>
-                            <document />
-                        </el-icon>
-                        <span>订单管理</span>
-                    </el-menu-item>
-                    <el-menu-item index="4">
-                       
-                            <el-icon><Postcard /></el-icon>
-                        
-                        <span>个人信息</span>
-                    </el-menu-item>
-                    <el-menu-item index="5">
-                        <el-icon>
-                            <setting />
-                        </el-icon>
-                        <span>操作日志</span>
-                    </el-menu-item>
-                    <el-menu-item index="6">
-                        <el-icon><EditPen /></el-icon>
-                        <span>用户管理</span>
-                    </el-menu-item>
-                </el-menu>
-            </el-col> </div>
-           
+        <div class="menu">
+            <el-menu default-active="0" class="el-menu-vertical-demo">
+                <el-menu-item v-for="(item, index) in childrenRouter" :index="String(index)" :key="index"
+                    @click="routeChange(item)">
+                    <el-icon><el-icon>
+                            <PieChart />
+                        </el-icon></el-icon>
+                    <span>{{ item.meta.title }}</span>
+                </el-menu-item>
+            </el-menu>
+        </div>
     </div>
-</template>   
+</template>
 
 <style scoped>
-.warpper{
+.warpper {
     margin-top: 10px;
 }
-
 </style>
