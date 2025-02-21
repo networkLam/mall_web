@@ -30,7 +30,10 @@ function findChildren(routerInfo: readonly RouteRecordRaw[]): Ref<any[]> {
         const children = routerInfo[index].children;
         if (children) { // 这里确保了children不是undefined
             for (let i = 0; i < children.length; i++) {
-                res.value.push(children[i]);
+                const show = children[i].meta!.show;
+                if (show === true) {
+                    res.value.push(children[i]);
+                }
             }
         }
     }
@@ -38,37 +41,25 @@ function findChildren(routerInfo: readonly RouteRecordRaw[]): Ref<any[]> {
 }
 const childrenRouter = findChildren(routerInfoAll)
 
-
 //路由导航
-const routeChange = (toAnywhere: RouteRecordRaw,index:number) => {
-    console.log(toAnywhere)
-    //先跳转路由再generating tab
-    router.push(toAnywhere.path)
-    //实现tab标签导航
-    if (toAnywhere.meta) {
-        const temp = {
-            title: typeof toAnywhere.meta.title === 'string' ? toAnywhere.meta.title : '暂无标题',
-            router: toAnywhere.path
-        };
-        tabs.setNavigation(temp);
-        tabs.setActiveIndex(index);
-    }
+const routeChange = (toAnywhere: RouteRecordRaw) => {
+    tabs.navigationTo(toAnywhere.path)
 }
-//默认展示控制面板的信息，且不可关闭
-routeChange(childrenRouter.value[0],0);
+//默认展示控制面板的信息，且不可关闭 (因为0位不可关闭)
+routeChange(childrenRouter.value[0]);
 tabs.setActiveIndex(0);
 </script>
 
 <template>
     <div class="warpper">
         <div class="menu">
-            <el-menu default-active="0" class="el-menu-vertical-demo">
+            <el-menu class="el-menu-vertical-demo">
                 <el-menu-item v-for="(item, index) in childrenRouter" :index="String(index)" :key="index"
-                    @click="routeChange(item,index)">
-                    <el-icon><el-icon>
-                            <PieChart />
-                        </el-icon></el-icon>
-                    <span>{{ item.meta.title }}</span>
+                    @click="routeChange(item)">
+                    <el-icon>
+                        <PieChart />
+                    </el-icon>
+                    <span>{{ item.meta.title + '|' + item.meta.show }}</span>
                 </el-menu-item>
             </el-menu>
         </div>

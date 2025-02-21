@@ -49,36 +49,36 @@ pie =  reactive({
   ]
 });
 
-request("/api/administrator/gender").then(res=>{
-  const {data} = res.data;
-  pie.series[0].data[0].value = data.men;
-  pie.series[0].data[1].value = data.female;
-  pie.series[0].data[2].value = data.amount - data.men - data.female;
-  myChart1.setOption(pie);
-  // console.log(data)
-})
+// request("/api/administrator/gender").then(res=>{
+//   const {data} = res.data;
+//   pie.series[0].data[0].value = data.men;
+//   pie.series[0].data[1].value = data.female;
+//   pie.series[0].data[2].value = data.amount - data.men - data.female;
+//   myChart1.setOption(pie);
+//   // console.log(data)
+// })
 
-request("/api/order/admin/parcel").then(res=>{
-  const {data} = res.data;
-  for(const item of data){
-    // console.log(item)
-    bar.yAxis.data.unshift(item.destination);
-    bar.series[0].data.unshift(item.total);
-  }
-  myChart2.setOption(bar);
-  // console.log(data)
-})
+// request("/api/order/admin/parcel").then(res=>{
+//   const {data} = res.data;
+//   for(const item of data){
+//     // console.log(item)
+//     bar.yAxis.data.unshift(item.destination);
+//     bar.series[0].data.unshift(item.total);
+//   }
+//   myChart2.setOption(bar);
+//   // console.log(data)
+// })
 
-request("/api/order/admin/sales").then(res=>{
-  const {data} = res.data;
-  for(const item of data){
-    // console.log(item)
-    line_simple.xAxis.data.push(item.localDate);
-    line_simple.series[0].data.push(item.total);
-  }
-  myChart3.setOption(line_simple);
-  console.log(data)
-})
+// request("/api/order/admin/sales").then(res=>{
+//   const {data} = res.data;
+//   for(const item of data){
+//     // console.log(item)
+//     line_simple.xAxis.data.push(item.localDate);
+//     line_simple.series[0].data.push(item.total);
+//   }
+//   myChart3.setOption(line_simple);
+//   console.log(data)
+// })
 bar = {
   title: {
     text: '最近100张订单发往的最多城市'
@@ -142,15 +142,15 @@ line_simple = {
 
 // var chartDom = document.getElementById('main');
 
-onMounted(()=>{
- // console.log(content.value)
-   myChart1 = echarts.init(content.value);
-   myChart2 = echarts.init(content1.value);
-   myChart3 = echarts.init(content2.value);
-   pie && myChart1.setOption(pie);
-   bar && myChart2.setOption(bar);
-   line_simple && myChart3.setOption(line_simple);
-})
+// onMounted(()=>{
+//  // console.log(content.value)
+//    myChart1 = echarts.init(content.value);
+//    myChart2 = echarts.init(content1.value);
+//    myChart3 = echarts.init(content2.value);
+//    pie && myChart1.setOption(pie);
+//    bar && myChart2.setOption(bar);
+//    line_simple && myChart3.setOption(line_simple);
+// })
 
 
 
@@ -159,14 +159,15 @@ onMounted(()=>{
 <template>
     <!-- 这是根标签 -->
     <div class="wrapper">   
-      <div>
+      <h2>待开发</h2>
+      <!-- <div>
         <div> <div ref="content" style="width: 600px;height: 420px;"></div> </div>
         <div> <div ref="content1" style="width: 600px;height: 420px;"></div> </div>
-      </div>
+      </div> -->
         
-     <div>
+     <!-- <div>
       <div> <div ref="content2" style="width: 980px;height: 820px;"></div> </div>
-     </div>
+     </div> -->
      
     </div>
   </template>

@@ -1,40 +1,41 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
-import LoginView from "../views/LoginView.vue"
+import LoginView from '../views/LoginView.vue'
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
       //路由重定向
       path: '/',
-      redirect:"/login"
+      redirect: '/login'
     },
     {
-      path:"/testview",
-      name:"testview",
-      component:()=>import('../views/TestView.vue')
+      path: '/testview',
+      name: 'testview',
+      component: () => import('../views/TestView.vue')
     },
     {
       path: '/login',
       name: 'login',
       component: LoginView,
-      meta:{
-        title:"登录"
+      meta: {
+        title: '登录'
       }
     },
     {
-      path:"/home",
-      name : "home",
-      component : HomeView,
-      meta:{
-        title:"主页"
+      path: '/home',
+      name: 'home',
+      component: HomeView,
+      meta: {
+        title: '主页'
       },
-      children:[
+      children: [
         {
           path: '/central',
           name: 'central',
-          meta:{
-            title:"控制面板"
+          meta: {
+            title: '控制面板',
+            show:true //将不展示在主菜单；
           },
           // route level code-splitting
           // this generates a separate chunk (About.[hash].js) for this route
@@ -45,18 +46,19 @@ const router = createRouter({
           //
           path: '/profile',
           name: 'profile',
-          meta:{
-            title:"个人信息"
+          meta: {
+            title: '个人信息',
+            show:true //将不展示在主菜单；
           },
-          
           component: () => import('../views/ProfileView.vue')
         },
         {
           //
           path: '/log',
           name: 'log',
-          meta:{
-            title:"操作日志"
+          meta: {
+            title: '操作日志',
+            show:true //将不展示在主菜单；
           },
           component: () => import('../views/LogView.vue')
         },
@@ -64,8 +66,9 @@ const router = createRouter({
           //
           path: '/product',
           name: 'product',
-          meta:{
-            title:"商品管理"
+          meta: {
+            title: '商品管理',
+            show:true //将不展示在主菜单；
           },
           component: () => import('../views/ProductView.vue')
         },
@@ -73,8 +76,9 @@ const router = createRouter({
           //
           path: '/order',
           name: 'order',
-          meta:{
-            title:"订单管理"
+          meta: {
+            title: '订单管理',
+            show:true //将不展示在主菜单；
           },
           component: () => import('../views/OrderView.vue')
         },
@@ -82,33 +86,42 @@ const router = createRouter({
           //
           path: '/user',
           name: 'user',
-          meta:{
-            title:"用户管理"
+          meta: {
+            title: '用户管理',
+            show:true //将不展示在主菜单；
           },
           component: () => import('../views/UserView.vue')
         },
+        {
+          path: '/addproduct',
+          name: 'addproduct',
+          meta: {
+            title: '添加商品',
+            show:false //将不展示在主菜单；
+          },
+          component: () => import('../views/AddproductView.vue')
+        }
       ]
-    },
+    }
   ]
 })
 
-router.beforeEach(async (to,from,next)=>{
-  if(to.meta.title){
+router.beforeEach(async (to, from, next) => {
+  if (to.meta.title) {
     //修改标题
-    document.title = to.meta.title as string;
+    document.title = to.meta.title as string
   }
 
-  if(to.path == '/login' ){
-    next();
-  }else{
-    const token = localStorage.getItem('token') == null ? null : localStorage.getItem('token') ;
-    if(token == null){
-      alert("你还未登录，即将返回登录界面");
-      next('/login');
-    }else{
-      next();
+  if (to.path == '/login') {
+    next()
+  } else {
+    const token = localStorage.getItem('token') == null ? null : localStorage.getItem('token')
+    if (token == null) {
+      alert('你还未登录，即将返回登录界面')
+      next('/login')
+    } else {
+      next()
     }
-    
   }
 })
 

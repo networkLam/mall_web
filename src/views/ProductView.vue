@@ -135,6 +135,11 @@ import { Search, Plus } from '@element-plus/icons-vue'
 import { ref, reactive, onMounted, watch, onBeforeMount } from 'vue';
 import request from '@/utils/request';
 import api from "@/utils/api";
+import { useRoute,useRouter } from 'vue-router';
+import { useNavigationTab } from "../stores/navigation"
+const tabs = useNavigationTab();
+const router = useRouter();
+
 //判断是新增还是更新
 let updateOrInsert = ref(false);
 
@@ -393,11 +398,7 @@ const onSubmit = () => {
 }
 //添加
 const addproduct = () => {
-  showTable.value = true;
-  (Object.keys(form) as (keyof typeof form)[]).forEach((key) => {
-    form[key] = "";
-  });
-  updateOrInsert.value = false; //是新增
+  tabs.navigationTo('/addproduct')
 }
 
 

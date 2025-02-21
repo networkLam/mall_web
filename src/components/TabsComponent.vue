@@ -6,7 +6,6 @@
       <div @click.stop="closeRouter(item.router)" style="margin-left: 5px;" v-if="index !== 0"><el-icon>
           <CircleClose />
         </el-icon></div>
-     
     </div>
 
   </div>
