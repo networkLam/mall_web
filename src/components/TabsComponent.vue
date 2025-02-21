@@ -1,12 +1,14 @@
 <template>
   <div class="wrapper">
-    <div style="width: 180px;height: 30px;background:green;margin: 4px;;" v-for="(item, index) in props.items"
-      :key="index" @click="getRoute(item.router, index)">
-      <div style="display: flex;">
+
+    <div class="tabs" :class="{'active':index === tabs.getActiveIndex}" v-for="(item, index) in props.items" :key="index" @click="getRoute(item.router, index)">
         <div>{{ item.title }}</div>
-        <div @click.stop="closeRouter(item.router)" style="margin-left: 5px;;">X</div>
-      </div>
+      <div @click.stop="closeRouter(item.router)" style="margin-left: 5px;" v-if="index !== 0"><el-icon>
+          <CircleClose />
+        </el-icon></div>
+     
     </div>
+
   </div>
 </template>
 
@@ -44,7 +46,7 @@ const getRoute = (e: string, index: number) => {
 
 const closeRouter = (e: string) => {
   // console.log('test1', e)
-  tabs.removeMeta(e,router)
+  tabs.removeMeta(e, router)
 }
 
 onMounted(() => {
@@ -57,5 +59,23 @@ watchEffect(() => {
 <style scoped lang='less'>
 .wrapper {
   display: flex;
+
+  .tabs {
+    width: 180px;
+    height: 30px;
+    // background: white;
+    margin: 4px;
+    border: 1px solid black;
+    border-radius: 8px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+  }
+}
+
+.active{
+  background-color: #67C23A;
+  color: white;
 }
 </style>
