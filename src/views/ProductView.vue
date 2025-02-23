@@ -137,6 +137,7 @@ import request from '@/utils/request';
 import api from "@/utils/api";
 import { useRoute,useRouter } from 'vue-router';
 import { useNavigationTab } from "../stores/navigation"
+import { navigationTo } from '@/utils/navigation';
 const tabs = useNavigationTab();
 const router = useRouter();
 
@@ -398,7 +399,13 @@ const onSubmit = () => {
 }
 //添加
 const addproduct = () => {
-  tabs.navigationTo('/addproduct')
+  // tabs.navigationTo('/addproduct')
+  navigationTo('/addproduct');
+  showTable.value = true;
+  (Object.keys(form) as (keyof typeof form)[]).forEach((key) => {
+    form[key] = "";
+  });
+  updateOrInsert.value = false; //是新增
 }
 
 

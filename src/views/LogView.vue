@@ -72,6 +72,7 @@ watch(currentPage, () => {
       const { data } = res.data
       data_list.length = 0;//在請求到數據之前清零展示的列表
       data.forEach((item: any) => {
+        //why are you doing ?
         request(api.MANAGEINFO + `?id=${item.m_id}`).then(res => {
           let { name } = res.data.data;
           const temp: LogInfoShow = {
@@ -82,7 +83,7 @@ watch(currentPage, () => {
           }
           temp.name = name;
           temp.action = item.actions;
-          temp.target = item.pd_id;
+          temp.target = item.productName;
           temp.time = item.time;
           data_list.push(temp)
         })
