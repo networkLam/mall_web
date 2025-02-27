@@ -4,7 +4,7 @@ import MenuComponent from '@/components/MenuComponent.vue';
 // import tabsComponent from '@/components/tabsComponent.vue';
 import tabsComponent from '@/components/TabsComponent.vue';
 import { useOnlogin } from '../stores/index'
-import { useRouter, type RouteRecordRaw } from "vue-router"
+import { useRoute, useRouter, type RouteRecordRaw } from "vue-router"
 import { ref, watch, type Ref } from 'vue'
 import { useNavigationTab } from '@/stores/navigation';
 import router from '../router/index'
@@ -12,6 +12,7 @@ const userName = useOnlogin().getUserName;
 const Link = useOnlogin().getSrc;
 console.log(Link)
 const Router = useRouter();
+const route = useRoute();
 // route.push("/central")
 // console.log("%centry home page", "color:red;")
 //将路由信息初始化
@@ -52,7 +53,15 @@ const childrenRouter = findChildren(routerInfoAll)
 
 tabs.setRouterInfo(childrenRouter);
 tabs.setRouter(Router);
-
+/**
+ * 
+ * <router-view v-slot="{ Component }">
+          <keep-alive>
+              <component :is="Component" ></component>
+          </keep-alive>
+        </router-view>
+ * 
+ */
 
 </script>
 <template>
@@ -65,12 +74,11 @@ tabs.setRouter(Router);
         <tabsComponent :items="tabs.getNavigationInfo"></tabsComponent>
         <router-view v-slot="{ Component }">
           <keep-alive>
-            <component :is="Component"></component>
+            <Transition>
+              <component :is="Component" :key="route.path" />
+            </Transition>
           </keep-alive>
         </router-view>
-        <!-- <keep-alive>
-          <router-view></router-view>
-        </keep-alive> -->
       </div>
     </div>
   </div>
@@ -85,5 +93,15 @@ tabs.setRouter(Router);
 .content-right {
   width: 100%;
   float: right;
+}
+
+.v-enter-active,
+.v-leave-active {
+  transition: opacity 0.3s;
+}
+
+.v-enter-from,
+.v-leave-to {
+  opacity: 0;
 }
 </style>

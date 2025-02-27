@@ -138,6 +138,7 @@ import api from "@/utils/api";
 import { useRoute,useRouter } from 'vue-router';
 import { useNavigationTab } from "../stores/navigation"
 import { navigationTo } from '@/utils/navigation';
+import dayjs, { Dayjs } from 'dayjs';
 const tabs = useNavigationTab();
 const router = useRouter();
 
@@ -229,6 +230,8 @@ watch(currentPage, (newVal, oldVal) => {
     tableData.length = 0;
     data.forEach((item, index) => {
       data[index].picture_name = "http://localhost:8080/upload/" + data[index].picture_name;
+      data[index].time = dayjs(data[index].time).format("YYYY-MM-DD HH:mm");
+      // console.log(data[index].time)
       tableData[index] = data[index];
     })
   })
@@ -316,6 +319,7 @@ const updatePage = async () => {
     const data: ProductList[] = res.data.data;
     data.forEach((item, index) => {
       data[index].picture_name = "http://localhost:8080/upload/" + data[index].picture_name;
+      data[index].time = dayjs(data[index].time).format("YYYY-MM-DD HH:mm");
       tableData[index] = data[index];
     })
   })
@@ -400,7 +404,7 @@ const onSubmit = () => {
 //添加
 const addproduct = () => {
   // tabs.navigationTo('/addproduct')
-  navigationTo('/addproduct');
+  // navigationTo('/addproduct');
   showTable.value = true;
   (Object.keys(form) as (keyof typeof form)[]).forEach((key) => {
     form[key] = "";
@@ -420,6 +424,7 @@ onBeforeMount(async () => {
     const data: ProductList[] = res.data.data;
     data.forEach((item, index) => {
       data[index].picture_name = "http://localhost:8080/upload/" + data[index].picture_name;
+      data[index].time = dayjs(data[index].time).format("YYYY-MM-DD HH:mm");
       tableData[index] = data[index];
     })
   })

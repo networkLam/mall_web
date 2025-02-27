@@ -59,7 +59,7 @@ tabs.setActiveIndex(0);
                     <el-icon>
                         <PieChart />
                     </el-icon>
-                    <span>{{ item.meta.title + '|' + item.meta.show }}</span>
+                    <span>{{ item.meta.title }}</span>
                 </el-menu-item>
             </el-menu>
         </div>

@@ -5,12 +5,11 @@
         <div style="display: flex;justify-content: center">
           <div class="infinite-list">
             <div class="infinite-list-item" v-for="(data, index) in data_list" :key="index">
-              <span>管理员：</span>
-              <span>{{ data.name }}</span>
+              <!-- <span>管理员：</span> -->
+              <span>{{ data.userName }}</span>
               <span>&nbsp;>> </span>
               <span> {{ '对' }}</span>
-              <span>编号为:</span>
-              <span> {{ data.target }}</span>
+              <span style="font-weight: 600;"> {{ data.target }}</span>
               <span>的商品</span>
               <span>发起了更新操作</span>
               <span>在</span>
@@ -23,12 +22,12 @@
         <div style="display: flex;justify-content: center">
           <div class="infinite-list">
             <div class="infinite-list-item" v-for="(data, index) in data_list" :key="index">
-              <span>管理员：</span>
-              <span>{{ data.name }}</span>
+              <!-- <span>管理员：</span> -->
+              <span>{{ data.userName }}</span>
               <span>&nbsp;>> </span>
               <span> {{ '对' }}</span>
               <span>编号为:</span>
-              <span> {{ data.target }}</span>
+              <span style="font-weight: 600;"> {{ data.target }}</span>
               <span>的订单</span>
               <span>发起了更新操作</span>
               <span>在</span>
@@ -50,7 +49,7 @@ import { useRoute, useRouter } from 'vue-router';
 import type { LogInfoShow } from '@/typemanual/typemian';
 import request from '@/utils/request';
 import api from '@/utils/api';
-import type { TabsPaneContext } from 'element-plus'
+import { dayjs, type TabsPaneContext } from 'element-plus'
 //show the data
 const data_list = reactive<LogInfoShow[]>([]);
 const currentPage = ref(1);
@@ -65,60 +64,64 @@ watch(currentPage, () => {
     offset = (currentPage.value - 1) * 10;
   }
   if (activity_view.value == 'product') {
-    //获取商品日志的总行数
-    getProductData_count();
-    request(api.LOGINFO + `?start=${offset}`).then(res => {
-      // console.log(res.data)
-      const { data } = res.data
-      data_list.length = 0;//在請求到數據之前清零展示的列表
-      data.forEach((item: any) => {
-        //why are you doing ?
-        request(api.MANAGEINFO + `?id=${item.m_id}`).then(res => {
-          let { name } = res.data.data;
-          const temp: LogInfoShow = {
-            name: '',
-            action: '',
-            target: '',
-            time: ''
-          }
-          temp.name = name;
-          temp.action = item.actions;
-          temp.target = item.productName;
-          temp.time = item.time;
-          data_list.push(temp)
-        })
-      })
-    })
-
+    //获取商品日志
+    getProductLog();
   } else {
-    getOrderData_count();
-    //  订单日志
-    request(api.LOGORDER + `?start=${offset}`).then(res => {
-      // console.log(res.data)
-      const { data } = res.data
-      // console.log(data)
-      data_list.length = 0;//在請求到數據之前清零展示的列表
-      data.forEach((item: any) => {
-        request(api.MANAGEINFO + `?id=${item.m_id}`).then(res => {
-          let { name } = res.data.data;
-          const temp: LogInfoShow = {
-            name: '',
-            action: '',
-            target: '',
-            time: ''
-          }
-          temp.name = name;
-          temp.action = item.actions;
-          temp.target = item.order_number;
-          temp.time = item.time;
-          data_list.push(temp)
-          // console.log(temp)
-        })
-      })
-    })
+    getOrderLog();
   }
 })
 
+//获取商品操作的日志
+function getProductLog() {
+  getProductData_count();
+  data_list.length = 0;//在請求到數據之前清零展示的列表
+  request(api.LOGINFO + `?start=${offset}`).then(res => {
+    // console.log(res.data)
+    const { data } = res.data
+    if (Array.isArray(data)) {
+      data.forEach((item: any) => {
+        const tempData: LogInfoShow = {
+          userName: '',
+          action: '',
+          target: '',
+          time: ''
+        }
+        tempData.userName = item.userName;
+        tempData.action = item.action;
+        tempData.target = item.productName;
+        tempData.time = dayjs(item.time).format('YYYY-MM-DD HH:mm:ss')
+        data_list.push(tempData)
+      })
+    }
+
+  })
+}
+
+//获取订单操作的日志
+function getOrderLog() {
+  getOrderData_count();
+  //  订单日志
+  data_list.length = 0;//在請求到數據之前清零展示的列表
+  request(api.LOGORDER + `?start=${offset}`).then(res => {
+    const { data } = res.data;
+    if (Array.isArray(data)) {
+      data.forEach(async (item: any) => {
+        const temp_data: LogInfoShow = {
+          userName: '',
+          action: '',
+          target: '',
+          time: ''
+        }
+        temp_data.userName = item.userName;
+        temp_data.action = item.action;
+        temp_data.target = item.order_number;
+        temp_data.time = dayjs(item.time).format("YYYY-MM-DD HH:mm:ss");
+        data_list.push(temp_data)
+      })
+    }
+
+  })
+}
 
 onMounted(() => {
   //console.log('3.-组件挂载到页面之后执行-------onMounted')
@@ -127,57 +130,9 @@ onMounted(() => {
 //點擊切換頁時的初始化
 const tabClickInit = (tabName: string) => {
   if (tabName == 'product') {
-    getProductData_count();
-    request(api.LOGINFO + "?start=0").then(res => {
-      /** 
-       * 申请数据
-      */
-      const data = res.data.data as any[];
-      data.forEach(async (item, index) => {
-        // let temp_name = '',temp_order_number = '';
-        await request(api.MANAGEINFO + `?id=${item.m_id}`).then(res => {
-          let { name } = res.data.data;
-          const temp: LogInfoShow = {
-            name: '',
-            action: '',
-            target: '',
-            time: ''
-          }
-          temp.name = name;
-          temp.action = item.actions;
-          temp.target = item.pd_id;
-          temp.time = item.time;
-          data_list.push(temp)
-        })
-      })
-    })
-  }else{
-    getOrderData_count();
-    //  订单日志
-    data_list.length = 0;//在請求到數據之前清零展示的列表
-    request(api.LOGORDER + `?start=0`).then(res => {
-      // console.log(res.data)
-      const { data } = res.data
-      // console.log(data)
-      data.forEach( async (item: any) => {
-        await  request(api.MANAGEINFO + `?id=${item.m_id}`).then(res => {
-          let { name } = res.data.data;
-          const temp: LogInfoShow = {
-            name: '',
-            action: '',
-            target: '',
-            time: ''
-          }
-          temp.name = name;
-          temp.action = item.actions;
-          temp.target = item.order_number;
-          temp.time = item.time;
-          data_list.push(temp)
-          // console.log(temp)
-        })
-      })
-    })
-
+    getProductLog();
+  } else {
+    getOrderLog();
   }
 
 }
@@ -192,6 +147,7 @@ const getProductData_count = () => {
   })
 }
 
+
 const getOrderData_count = () => {
   request(api.LOGORDERCOUNT).then(res => {
     // console.log(res);
@@ -204,6 +160,11 @@ const getOrderData_count = () => {
 
 //默认活动界面
 const activeName = ref('product')
+//切换页面的时候重置
+watch(activeName, () => {
+  offset = 0;
+})
+
 const handleClick = (tab: TabsPaneContext, event: Event) => {
   activity_view.value = tab.props.name as string;
   currentPage.value = 1;//刷新當前页码

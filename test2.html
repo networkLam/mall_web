@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>WebSocket Test</title>
+</head>
+<body>
+    <h2>WebSocket Test</h2>
+    <button onclick="sendMessage()">Send Message</button>
+    <script>
+        const socket = new WebSocket("ws://localhost:8080/ws");
+        socket.onopen = () => {
+            console.log("WebSocket is open now.");
+        };
+        socket.onmessage = (event) => {
+            console.log("Message from server: " + event.data);
+        };
+        socket.onclose = () => {
+            console.log("WebSocket is closed now.");
+        };
+        function sendMessage() {
+            socket.send("Hello from the client!");
+        }
+    </script>
+</body>
+</html>

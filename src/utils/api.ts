@@ -24,5 +24,4 @@ export default {
     GETUSERINFO:"/api/user/info?start=",//分页获取用户信息
     UPDATEUSERNAME:"/api/user/update/name",//更新用户名
     RESTUSERPWD:"/api/user/rest/pwd?uid=",//重置用户密码
-
 }

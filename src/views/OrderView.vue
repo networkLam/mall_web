@@ -1,168 +1,174 @@
 <template>
   <div class="wrapper">
-    <el-tabs v-model="activeName" class="demo-tabs" @tab-click="handleClick">
-      <!-- 一共有四种状态 待发货 待签收 退款-->
-      <el-tab-pane label="待发货" name="wait">
-        <el-table :data="tableData" style="width: 100%">
-          <el-table-column label="下单日期" width="280">
-            <template #default="scope">
-              <div style="display: flex; align-items: center">
-                <el-icon>
-                  <timer />
-                </el-icon>
-                <span style="margin-left: 10px">{{ scope.row.time }}</span>
-              </div>
-            </template>
-          </el-table-column>
-          <el-table-column label="状态" width="180">
-            <template #default="scope">
-              <el-tag >{{ state_compute(scope.row.state) }}</el-tag>
-            </template>
-          </el-table-column>
-          <el-table-column label="订单编号" width="180">
-            <template #default="scope">
-              <el-tag>{{ scope.row.order_number }}</el-tag>
-            </template>
-          </el-table-column>
-          <el-table-column label="价格(元)" width="180">
-            <template #default="scope">
-              <el-tag>{{ scope.row.money }}</el-tag>
-            </template>
-          </el-table-column>
-          <el-table-column label="操作">
-            <template #default="scope">
-              <el-button size="small" @click="handleEdit(scope.$index, scope.row)">
-                编辑
-              </el-button>
-              <el-button size="small" type="danger" @click="handleDelete(scope.$index, scope.row)">
-                退单
-              </el-button>
-            </template>
-          </el-table-column>
-        </el-table>
-      </el-tab-pane>
-      <el-tab-pane label="待签收" name="sign">
-        <el-table :data="tableData" style="width: 100%">
-          <el-table-column label="下单日期" width="280">
-            <template #default="scope">
-              <div style="display: flex; align-items: center">
-                <el-icon>
-                  <timer />
-                </el-icon>
-                <span style="margin-left: 10px">{{ scope.row.time }}</span>
-              </div>
-            </template>
-          </el-table-column>
-          <el-table-column label="状态" width="180">
-            <template #default="scope">
-              <el-tag type="warning">{{ state_compute(scope.row.state) }}</el-tag>
-            </template>
-          </el-table-column>
-          <el-table-column label="订单编号" width="180">
-            <template #default="scope">
-              <el-tag>{{ scope.row.order_number }}</el-tag>
-            </template>
-          </el-table-column>
-          <el-table-column label="价格(元)" width="180">
-            <template #default="scope">
-              <el-tag>{{ scope.row.money }}</el-tag>
-            </template>
-          </el-table-column>
-          <el-table-column label="操作">
-            <template #default="scope">
-              <el-button size="small" @click="handleEdit(scope.$index, scope.row)">
-                编辑
-              </el-button>
-              <el-button size="small" type="danger" @click="handleDelete(scope.$index, scope.row)">
-                退单
-              </el-button>
-            </template>
-          </el-table-column>
-        </el-table>
-      </el-tab-pane>
-      <el-tab-pane label="退款退货" name="refund">
-        <el-table :data="tableData" style="width: 100%">
-          <el-table-column label="下单日期" width="280">
-            <template #default="scope">
-              <div style="display: flex; align-items: center">
-                <el-icon>
-                  <timer />
-                </el-icon>
-                <span style="margin-left: 10px">{{ scope.row.time }}</span>
-              </div>
-            </template>
-          </el-table-column>
-          <el-table-column label="状态" width="180">
-            <template #default="scope">
-              <el-tag type="danger">{{ state_compute(scope.row.state) }}</el-tag>
-            </template>
-          </el-table-column>
-          <el-table-column label="订单编号" width="180">
-            <template #default="scope">
-              <el-tag>{{ scope.row.order_number }}</el-tag>
-            </template>
-          </el-table-column>
-          <el-table-column label="价格(元)" width="180">
-            <template #default="scope">
-              <el-tag>{{ scope.row.money }}</el-tag>
-            </template>
-          </el-table-column>
-          <el-table-column label="操作">
-            <template #default="scope">
-              <el-button size="small" @click="handleEdit(scope.$index, scope.row)">
-                编辑
-              </el-button>
-              <el-button size="small" type="danger" @click="handleDelete(scope.$index, scope.row)">
-                退单
-              </el-button>
-            </template>
-          </el-table-column>
-        </el-table>
-      </el-tab-pane>
-      <el-tab-pane label="交易完成" name="finish">
-        <el-table :data="tableData" style="width: 100%">
-          <el-table-column label="下单日期" width="280">
-            <template #default="scope">
-              <div style="display: flex; align-items: center">
-                <el-icon>
-                  <timer />
-                </el-icon>
-                <span style="margin-left: 10px">{{ scope.row.time }}</span>
-              </div>
-            </template>
-          </el-table-column>
-          <el-table-column label="状态" width="180">
-            <template #default="scope">
-              <el-tag type="success">{{ state_compute(scope.row.state) }}</el-tag>
-            </template>
-          </el-table-column>
-          <el-table-column label="订单编号" width="180">
-            <template #default="scope">
-              <el-tag>{{ scope.row.order_number }}</el-tag>
-            </template>
-          </el-table-column>
-          <el-table-column label="价格(元)" width="180">
-            <template #default="scope">
-              <el-tag>{{ scope.row.money }}</el-tag>
-            </template>
-          </el-table-column>
-          <el-table-column label="操作">
-            <template #default="scope">
-              <el-button size="small" @click="handleEdit(scope.$index, scope.row)">
-                编辑
-              </el-button>
-              <el-button size="small" type="danger" @click="handleDelete(scope.$index, scope.row)">
-                退单
-              </el-button>
-            </template>
-          </el-table-column>
-        </el-table>
-      </el-tab-pane>
-    </el-tabs>
-    <div class="pagin"><el-pagination background layout="prev, pager, next" :total="page_number" :default-page-size="10"
-      v-model:current-page="currentPage" /></div>
-    
-    <el-dialog v-model="dialogVisible" title="编辑" width="500" :before-close="handleClose">
+    <el-card>
+      <div v-show="newOrders"
+        style="width: 100%; height: 28px; color: #00aeec; font-size: 16px; text-align: center; line-height: 28px; border: 1px solid #e6e6e6; border-radius: 10px; box-shadow: rgba(50, 50, 93, 0.11) 4px 3px 6px, rgba(0, 0, 0, 0.08) 0px 1px 3px;; background-color: rgb(255 255 255);">
+        <span style="cursor: pointer;" @click="getlatestOrder">有新订单,点击刷新</span>
+      </div>
+      <el-tabs v-model="activeName" @tab-click="handleClick">
+        <!-- 一共有四种状态 待发货 待签收 退款-->
+        <el-tab-pane label="待发货" name="wait">
+          <el-table :data="tableData">
+            <el-table-column label="下单日期" width="280">
+              <template #default="scope">
+                <div style="display: flex; align-items: center">
+                  <el-icon>
+                    <timer />
+                  </el-icon>
+                  <span style="margin-left: 10px">{{ dayjs(scope.row.time).format("YYYY-MM-DD HH:mm:ss") }}</span>
+                </div>
+              </template>
+            </el-table-column>
+            <el-table-column label="状态" width="180">
+              <template #default="scope">
+                <el-tag>{{ state_compute(scope.row.state) }}</el-tag>
+              </template>
+            </el-table-column>
+            <el-table-column label="订单编号" width="180">
+              <template #default="scope">
+                <el-tag>{{ scope.row.order_number }}</el-tag>
+              </template>
+            </el-table-column>
+            <el-table-column label="价格(元)" width="180">
+              <template #default="scope">
+                <el-tag>{{ scope.row.money }}</el-tag>
+              </template>
+            </el-table-column>
+            <el-table-column label="操作" width="190">
+              <template #default="scope">
+                <el-button size="small" @click="handleEdit(scope.$index, scope.row)">
+                  编辑
+                </el-button>
+                <el-button size="small" type="danger" @click="handleDelete(scope.$index, scope.row)">
+                  退单
+                </el-button>
+              </template>
+            </el-table-column>
+          </el-table>
+        </el-tab-pane>
+        <el-tab-pane label="待签收" name="sign">
+          <el-table :data="tableData" style="width: 100%">
+            <el-table-column label="下单日期" width="280">
+              <template #default="scope">
+                <div style="display: flex; align-items: center">
+                  <el-icon>
+                    <timer />
+                  </el-icon>
+                  <span style="margin-left: 10px">{{ scope.row.time }}</span>
+                </div>
+              </template>
+            </el-table-column>
+            <el-table-column label="状态" width="180">
+              <template #default="scope">
+                <el-tag type="warning">{{ state_compute(scope.row.state) }}</el-tag>
+              </template>
+            </el-table-column>
+            <el-table-column label="订单编号" width="180">
+              <template #default="scope">
+                <el-tag>{{ scope.row.order_number }}</el-tag>
+              </template>
+            </el-table-column>
+            <el-table-column label="价格(元)" width="180">
+              <template #default="scope">
+                <el-tag>{{ scope.row.money }}</el-tag>
+              </template>
+            </el-table-column>
+            <el-table-column label="操作" width="190">
+              <template #default="scope">
+                <el-button size="small" @click="handleEdit(scope.$index, scope.row)">
+                  编辑
+                </el-button>
+                <el-button size="small" type="danger" @click="handleDelete(scope.$index, scope.row)">
+                  退单
+                </el-button>
+              </template>
+            </el-table-column>
+          </el-table>
+        </el-tab-pane>
+        <el-tab-pane label="退款退货" name="refund">
+          <el-table :data="tableData" style="width: 100%">
+            <el-table-column label="下单日期" width="280">
+              <template #default="scope">
+                <div style="display: flex; align-items: center">
+                  <el-icon>
+                    <timer />
+                  </el-icon>
+                  <span style="margin-left: 10px">{{ scope.row.time }}</span>
+                </div>
+              </template>
+            </el-table-column>
+            <el-table-column label="状态" width="180">
+              <template #default="scope">
+                <el-tag type="danger">{{ state_compute(scope.row.state) }}</el-tag>
+              </template>
+            </el-table-column>
+            <el-table-column label="订单编号" width="180">
+              <template #default="scope">
+                <el-tag>{{ scope.row.order_number }}</el-tag>
+              </template>
+            </el-table-column>
+            <el-table-column label="价格(元)" width="180">
+              <template #default="scope">
+                <el-tag>{{ scope.row.money }}</el-tag>
+              </template>
+            </el-table-column>
+            <el-table-column label="操作" width="190">
+              <template #default="scope">
+                <el-button size="small" @click="handleEdit(scope.$index, scope.row)">
+                  编辑
+                </el-button>
+                <el-button size="small" type="danger" @click="handleDelete(scope.$index, scope.row)">
+                  退单
+                </el-button>
+              </template>
+            </el-table-column>
+          </el-table>
+        </el-tab-pane>
+        <el-tab-pane label="交易完成" name="finish">
+          <el-table :data="tableData" style="width: 100%">
+            <el-table-column label="下单日期" width="280">
+              <template #default="scope">
+                <div style="display: flex; align-items: center">
+                  <el-icon>
+                    <timer />
+                  </el-icon>
+                  <span style="margin-left: 10px">{{ scope.row.time }}</span>
+                </div>
+              </template>
+            </el-table-column>
+            <el-table-column label="状态" width="180">
+              <template #default="scope">
+                <el-tag type="success">{{ state_compute(scope.row.state) }}</el-tag>
+              </template>
+            </el-table-column>
+            <el-table-column label="订单编号" width="180">
+              <template #default="scope">
+                <el-tag>{{ scope.row.order_number }}</el-tag>
+              </template>
+            </el-table-column>
+            <el-table-column label="价格(元)" width="180">
+              <template #default="scope">
+                <el-tag>{{ scope.row.money }}</el-tag>
+              </template>
+            </el-table-column>
+            <el-table-column label="操作" width="190">
+              <template #default="scope">
+                <el-button size="small" @click="handleEdit(scope.$index, scope.row)">
+                  编辑
+                </el-button>
+                <el-button size="small" type="danger" @click="handleDelete(scope.$index, scope.row)">
+                  退单
+                </el-button>
+              </template>
+            </el-table-column>
+          </el-table>
+        </el-tab-pane>
+      </el-tabs>
+
+      <div class="pagin"><el-pagination background layout="prev, pager, next" :total="page_number"
+          :default-page-size="10" v-model:current-page="currentPage" /></div>
+    </el-card>
+    <el-dialog v-model="dialogVisible" title="编辑" width="500">
       <!-- 表单开始 -->
       <el-form :model="form" label-width="auto" style="max-width: 600px">
         <el-form-item label="快递配送地址">
@@ -187,14 +193,15 @@
           <el-input v-model="form.exp_id" />
         </el-form-item>
         <el-form-item label="订单编号">
-          <el-input v-model="form.order_number"  disabled/>
+          <el-input v-model="form.order_number" disabled />
         </el-form-item>
         <el-form-item label="总价格">
-          <el-input v-model="form.money"  disabled/>
+          <el-input v-model="form.money" disabled />
         </el-form-item>
         <el-form-item label="购买信息">
-          <div v-for="(detail,index) in detail_arr" :key="index">
-            <GridComponent :describe="detail.describe" :amount="detail.number" :price="detail.totals" :url="detail.url"></GridComponent>
+          <div v-for="(detail, index) in detail_arr" :key="index">
+            <GridComponent :describe="detail.describe" :amount="detail.number" :price="detail.totals" :url="detail.url">
+            </GridComponent>
           </div>
         </el-form-item>
       </el-form>
@@ -216,12 +223,70 @@ import { ref, reactive, onMounted, watchEffect, computed, watch } from 'vue';
 import { ElMessageBox } from 'element-plus'
 import { useRoute, useRouter } from 'vue-router';
 import type { TabsPaneContext } from 'element-plus'
-import type { OrderList, DetailList,OrderDetails,ProductList } from '@/typemanual/typemian';
+import type { OrderList, DetailList, OrderDetails, ProductList } from '@/typemanual/typemian';
 import { Timer } from '@element-plus/icons-vue'
 import request from "@/utils/request"
 import api from "@/utils/api";
 import GridComponent from '@/components/GridComponent.vue';
-import {formatTime} from '@/utils/dateFormat'
+import { formatTime } from '@/utils/dateFormat'
+import { useOnlogin } from '@/stores';
+import dayjs from 'dayjs';
+// import SockJS from 'sockjs-client';
+// import Stomp from 'stompjs';
+const myToken = useOnlogin();
+let token1 = localStorage.getItem('token')
+// console.log(token1)//存在token
+//if a client building 3 socket communication,how to do difference they is a not the same ?
+//需要判断一下socket是否存活，如果存活就不重新连接
+// const socket = new WebSocket("ws://localhost:8080/ws");
+let socket: any;
+onMounted(() => {
+  socket = new WebSocket("ws://localhost:8080/chat?token=" + token1);
+  // socket = new WebSocket("ws://localhost:8080/chat")
+  socket.onopen = () => {
+    console.log("WebSocket is open now.");
+  };
+  //接收消息的管道
+  socket.onmessage = (event: any) => {
+    console.log(JSON.parse(event.data))
+    console.log("Message from server: " + event.data);
+    const updateInfo:{system:boolean,code:string,message:string} =  JSON.parse(event.data);
+    if(updateInfo.system == true && updateInfo.message == 'update'){
+      newOrders.value = true;
+    }
+  };
+  socket.onclose = () => {
+    //socket关闭时调用
+    console.log("WebSocket is closed now.");
+  };
+})
+
+function sendMessage() {
+  //发送消息的方法
+  // socket.send("Hello from the client!");
+  if (socket.readyState === WebSocket.OPEN) {
+    socket.send("Hello from the client!");
+  } else {
+    console.log("WebSocket is not ready. Current state: " + socket.readyState);
+  }
+}
+
+/***
+ * 
+ * 新订单提示
+ * 
+ */
+ //控制是否显示刷新bar control the bar is show or not
+ const newOrders = ref(false);
+  // get latest order information 
+ const getlatestOrder = ()=>{
+  newOrders.value = false;
+  //get order information via application program interface(API) 
+  ViewInit("wait", 0); //获取待发货的订单
+  activeName.value = 'wait' //跳转到待发货的页面
+ }
+
+
 const currentPageArr = reactive([1, 1, 1, 1]);//当前的页面(current page number)
 const row_totalArr = reactive([0, 0, 0, 0]) //总行数(each page)
 let point = 0;//定义一个指向（指向当前停留在那个页面
@@ -251,27 +316,27 @@ const form = reactive<OrderList>({
 const onSubmit = () => {
   console.log('submit!')
   // console.log(form)
-  const order = {...form};
+  const order = { ...form };
   console.log(order)
   request({
-    method:"post",
-    data:order,
-    url:api.ORDERUPDATE
-  }).then(res=>{
+    method: "post",
+    data: order,
+    url: api.ORDERUPDATE
+  }).then(res => {
     dialogVisible.value = false;
     //在页面更新
-   tableData.forEach((item,index)=>{
-    if(tableData[index].order_id == form.order_id){
-      tableData[index].contacts = form.contacts;//联系人
-      tableData[index].phone = form.phone; //手机
-      tableData[index].address = form.address;//地址
-      tableData[index].exp_id = form.exp_id;//快递号
-      tableData[index].state = form.state; //状态
-    }
-   })
+    tableData.forEach((item, index) => {
+      if (tableData[index].order_id == form.order_id) {
+        tableData[index].contacts = form.contacts;//联系人
+        tableData[index].phone = form.phone; //手机
+        tableData[index].address = form.address;//地址
+        tableData[index].exp_id = form.exp_id;//快递号
+        tableData[index].state = form.state; //状态
+      }
+    })
 
     console.log(res)
-  }).catch(err=>{
+  }).catch(err => {
     console.log(err)
   })
 }
@@ -299,14 +364,14 @@ const handleEdit = (index: number, row: OrderList) => {
     // console.log(res)
     //获取请求返回的数据
     const data = res.data.data as OrderDetails[];
-    data.forEach((item,index)=>{
+    data.forEach((item, index) => {
       const detail_obj = reactive<DetailList>({
-      number: 0,
-      totals: '',
-      url: '',
-      describe: '',
-      pd_id: 0
-    })
+        number: 0,
+        totals: '',
+        url: '',
+        describe: '',
+        pd_id: 0
+      })
       detail_obj.number = data[index].number; //数量
       detail_obj.totals = data[index].totals; //价格
       detail_obj.pd_id = data[index].pd_id; //商品id
@@ -314,13 +379,13 @@ const handleEdit = (index: number, row: OrderList) => {
     })
     // console.log("组件要使用的数据")
     // console.log(detail_arr)
-    detail_arr.forEach(async (item,index)=>{
-     await request(api.PRODUCTINFO+`?pdId=${ detail_arr[index].pd_id}`).then(res=>{
-      // console.log(res)
-      const data = res.data.data as ProductList;
-      detail_arr[index].url = "http://localhost:8080/upload/"+data.picture_name; //url地址
-      detail_arr[index].describe = data.p_describe;
-     })
+    detail_arr.forEach(async (item, index) => {
+      await request(api.PRODUCTINFO + `?pdId=${detail_arr[index].pd_id}`).then(res => {
+        // console.log(res)
+        const data = res.data.data as ProductList;
+        detail_arr[index].url = "http://localhost:8080/upload/" + data.picture_name; //url地址
+        detail_arr[index].describe = data.p_describe;
+      })
 
     })
   }).catch(err => {
@@ -330,13 +395,13 @@ const handleEdit = (index: number, row: OrderList) => {
 
 }
 
-const state_compute = (state:string):string=>{
+const state_compute = (state: string): string => {
   let res = ''
-  switch(state){
-    case 'wait':res = '待发货';break;
-    case 'sign':res = '待签收';break;
-    case 'refund':res = '退货退款';break;
-    case 'finish':res = '完成交易';break;
+  switch (state) {
+    case 'wait': res = '待发货'; break;
+    case 'sign': res = '待签收'; break;
+    case 'refund': res = '退货退款'; break;
+    case 'finish': res = '完成交易'; break;
   }
   return res;
 }
@@ -414,7 +479,7 @@ watch(currentPage, () => {
     })
     console.log(tableData)
   }).catch(err => {
-    console.log("出错了",err);
+    console.log("出错了", err);
   })
 })
 //切换标签页
@@ -451,10 +516,11 @@ const handleClick = (tab: TabsPaneContext, event: Event) => {
 .wrapper {
   margin-left: 10px;
 }
-.pagin{
+
+.pagin {
   margin-top: 20px;
   margin-bottom: 40px;
- display: flex;
- justify-content: center;
+  display: flex;
+  justify-content: center;
 }
 </style>

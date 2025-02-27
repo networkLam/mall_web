@@ -73,7 +73,7 @@ export interface DetailList {
   totals: string //总价（一共多少钱
   url: string //图片地址
   describe: string //商品描述
-  pd_id :number //产品id
+  pd_id: number //产品id
 }
 //查询商品的详细数据时候返回的数据（即订单中所包含的商品
 export interface OrderDetails {
@@ -82,21 +82,20 @@ export interface OrderDetails {
   order_id: number
   pd_id: number
   totals: string
-
 }
 
 //日志列表需要用到的数据
-export interface LogInfoShow{
-  name:string,//管理员姓名
-  action:string, //动作
-  target:string,//动作的对象
-  time:string, //发生的时间
+export interface LogInfoShow {
+  userName: string //管理员姓名
+  action: string //动作
+  target: string //动作的对象
+  time: string //发生的时间
 }
 //用户信息结构
-export interface User{
-  uid:number,
-  phone:string,
-  user_name:string,
-  gender:string,
-  register_time:string
+export interface User {
+  uid: number
+  phone: string
+  user_name: string
+  gender: string
+  register_time: string
 }

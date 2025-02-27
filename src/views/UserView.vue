@@ -74,6 +74,7 @@ const form = reactive<User>({
     gender: '',
     register_time: ''
 })
+//这些函数要改（认知的局限性导致的  
 const init = () => {
     request(api.GETUSERTOTAL).then(res => {
         page_number.value = res.data.data as number;
