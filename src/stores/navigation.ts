@@ -8,7 +8,7 @@ export const useNavigationTab = defineStore('navigation', {
       activeIndex: -1,
       //一开始就初始化这个路由，并将路由信息一起初始化进来，后面的所有关于路由的操作都通过storage的方式调用；
       router: null as any,
-      allRouterInfo:null as any, //本次登录的全部路由信息；
+      allRouterInfo: null as any //本次登录的全部路由信息；
     }
   },
   getters: {
@@ -43,7 +43,7 @@ export const useNavigationTab = defineStore('navigation', {
       }
     },
     //移除一个路由信息
-    removeMeta(routeName: string, router: Router) {
+    removeMeta(routeName: string) {
       // 检查这个路由是否已经存在
       const index = this.navigationInfo.findIndex((item) => item.router === routeName)
       if (index >= 0) {
@@ -53,10 +53,12 @@ export const useNavigationTab = defineStore('navigation', {
           // 更新 activeIndex 到最后一个有效索引
           this.activeIndex = Math.max(0, this.navigationInfo.length - 1)
           if (this.navigationInfo.length > 0) {
-            router.push(this.navigationInfo[this.activeIndex].router)
+            // router.push(this.navigationInfo[this.activeIndex].router)
+            this.router.push(this.navigationInfo[this.activeIndex].router)
           } else {
-            // 如果没有更多的路由项，你可以选择导航到一个默认路径或执行其他逻辑
-            router.push('/home')
+            // 最后的出口
+            this.router.push('/home')
+            // router.push('/home')
           }
         }
       } else {
@@ -64,35 +66,46 @@ export const useNavigationTab = defineStore('navigation', {
       }
     },
     //将路由初始化
-    setRouter(router:any){
-      this.router = router;
+    setRouter(router: any) {
+      this.router = router
     },
     //设置全部的路由信息；
-    setRouterInfo(routerInfo:any){
-      this.allRouterInfo = routerInfo;
-      console.log("allRouterInfo",this.allRouterInfo)
+    setRouterInfo(routerInfo: any) {
+      this.allRouterInfo = routerInfo
+      // console.log('allRouterInfo', this.allRouterInfo)
     },
     //路由导航
-    navigationTo(destination:string){
-      const routeLocal = this.allRouterInfo.findIndex((item:any) => item.path === destination);
+    navigationTo(destination: string, query: {}) {
+      const routeLocal = this.allRouterInfo.findIndex((item: any) => item.path === destination)
       //先把内容的组装
-      this.routeChange(this.allRouterInfo[routeLocal])
+      this.routeChange(this.allRouterInfo[routeLocal], query)
       // console.log('要导航的路由在-->',routeLocal)
     },
-    routeChange(toAnywhere: RouteRecordRaw){
-      console.log(toAnywhere)
+    routeChange(toAnywhere: RouteRecordRaw, query: {}) {
+      // console.log(toAnywhere)
       //先跳转路由再generating tab
-      if(this.router!=null){
-        this.router.push(toAnywhere.path)
+      if (this.router != null) {
+        this.router.push({ path: toAnywhere.path, query: { ...query } })
       }
       //实现tab标签导航
       if (toAnywhere.meta) {
-          const temp = {
-              title: typeof toAnywhere.meta.title === 'string' ? toAnywhere.meta.title : '暂无标题',
-              router: toAnywhere.path
-          };
-          this.setNavigation(temp);
+        const temp = {
+          title: typeof toAnywhere.meta.title === 'string' ? toAnywhere.meta.title : '暂无标题',
+          router: toAnywhere.path
+        }
+        this.setNavigation(temp)
       }
-  }
+    },
+    closeCurrentRoute() {
+      //关闭当前路由
+      // console.log('avtive==', this.activeIndex)
+      // console.log('this.allRouterInfo', this.allRouterInfo)
+      // console.log('当前活跃的路由', this.navigationInfo[this.activeIndex])
+      //从路由列表信息中移除它
+      this.navigationInfo.splice(this.activeIndex, 1)
+      //让指针往回退
+      this.activeIndex--;
+      this.router.push(this.navigationInfo[this.activeIndex].router)
+    }
   }
 })

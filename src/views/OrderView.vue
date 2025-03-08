@@ -117,9 +117,6 @@
                 <el-button size="small" @click="handleEdit(scope.$index, scope.row)">
                   编辑
                 </el-button>
-                <el-button size="small" type="danger" @click="handleDelete(scope.$index, scope.row)">
-                  退单
-                </el-button>
               </template>
             </el-table-column>
           </el-table>
@@ -163,6 +160,46 @@
             </el-table-column>
           </el-table>
         </el-tab-pane>
+        <el-tab-pane label="查找" name="search">
+          <h2>wait development</h2>
+          <!-- <el-table :data="tableData" style="width: 100%">
+            <el-table-column label="下单日期" width="280">
+              <template #default="scope">
+                <div style="display: flex; align-items: center">
+                  <el-icon>
+                    <timer />
+                  </el-icon>
+                  <span style="margin-left: 10px">{{ scope.row.time }}</span>
+                </div>
+              </template>
+            </el-table-column>
+            <el-table-column label="状态" width="180">
+              <template #default="scope">
+                <el-tag type="success">{{ state_compute(scope.row.state) }}</el-tag>
+              </template>
+            </el-table-column>
+            <el-table-column label="订单编号" width="180">
+              <template #default="scope">
+                <el-tag>{{ scope.row.order_number }}</el-tag>
+              </template>
+            </el-table-column>
+            <el-table-column label="价格(元)" width="180">
+              <template #default="scope">
+                <el-tag>{{ scope.row.money }}</el-tag>
+              </template>
+            </el-table-column>
+            <el-table-column label="操作" width="190">
+              <template #default="scope">
+                <el-button size="small" @click="handleEdit(scope.$index, scope.row)">
+                  编辑
+                </el-button>
+                <el-button size="small" type="danger" @click="handleDelete(scope.$index, scope.row)">
+                  退单
+                </el-button>
+              </template>
+            </el-table-column>
+          </el-table> -->
+        </el-tab-pane>
       </el-tabs>
 
       <div class="pagin"><el-pagination background layout="prev, pager, next" :total="page_number"
@@ -172,25 +209,25 @@
       <!-- 表单开始 -->
       <el-form :model="form" label-width="auto" style="max-width: 600px">
         <el-form-item label="快递配送地址">
-          <el-input v-model="form.address" />
+          <el-input v-model="form.address" :disabled="choose_status==='finish'?true:false" />
         </el-form-item>
         <el-form-item label="联系人">
-          <el-input v-model="form.contacts" />
+          <el-input v-model="form.contacts" :disabled="choose_status==='finish'?true:false" />
         </el-form-item>
         <el-form-item label="手机号">
-          <el-input v-model="form.phone" />
+          <el-input v-model="form.phone" :disabled="choose_status==='finish'?true:false"  />
         </el-form-item>
-        <el-form-item label="状态">
+        <!-- <el-form-item label="状态">
           <el-select v-model="form.state" placeholder="请选择状态">
             <el-option label="待发货" value="wait" />
             <el-option label="待签收" value="sign" />
             <el-option label="退货退款" value="refund" />
             <el-option label="已完成" value="finish" />
           </el-select>
-        </el-form-item>
+        </el-form-item> -->
 
         <el-form-item label="快递编号">
-          <el-input v-model="form.exp_id" />
+          <el-input v-model="form.exp_id" :disabled="choose_status==='finish'?true:false" />
         </el-form-item>
         <el-form-item label="订单编号">
           <el-input v-model="form.order_number" disabled />
@@ -209,8 +246,8 @@
       <template #footer>
         <div class="dialog-footer">
           <el-button @click="dialogVisible = false">取消</el-button>
-          <el-button type="primary" @click="onSubmit">
-            确定
+          <el-button type="primary" @click="onSubmit" :disabled="choose_status==='finish'">
+            {{ choose_status === 'wait' ? '发货' : '确认' }}
           </el-button>
         </div>
       </template>
@@ -219,7 +256,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted, watchEffect, computed, watch } from 'vue';
+import { ref, reactive, onMounted, watchEffect, computed, watch, onUnmounted } from 'vue';
 import { ElMessageBox } from 'element-plus'
 import { useRoute, useRouter } from 'vue-router';
 import type { TabsPaneContext } from 'element-plus'
@@ -250,8 +287,8 @@ onMounted(() => {
   socket.onmessage = (event: any) => {
     console.log(JSON.parse(event.data))
     console.log("Message from server: " + event.data);
-    const updateInfo:{system:boolean,code:string,message:string} =  JSON.parse(event.data);
-    if(updateInfo.system == true && updateInfo.message == 'update'){
+    const updateInfo: { system: boolean, code: string, message: string } = JSON.parse(event.data);
+    if (updateInfo.system == true && updateInfo.message == 'update') {
       newOrders.value = true;
     }
   };
@@ -259,6 +296,10 @@ onMounted(() => {
     //socket关闭时调用
     console.log("WebSocket is closed now.");
   };
+})
+
+onUnmounted(()=>{
+  console.log("order 被销毁")
 })
 
 function sendMessage() {
@@ -276,15 +317,15 @@ function sendMessage() {
  * 新订单提示
  * 
  */
- //控制是否显示刷新bar control the bar is show or not
- const newOrders = ref(false);
-  // get latest order information 
- const getlatestOrder = ()=>{
+//控制是否显示刷新bar control the bar is show or not
+const newOrders = ref(false);
+// get latest order information 
+const getlatestOrder = () => {
   newOrders.value = false;
   //get order information via application program interface(API) 
   ViewInit("wait", 0); //获取待发货的订单
   activeName.value = 'wait' //跳转到待发货的页面
- }
+}
 
 
 const currentPageArr = reactive([1, 1, 1, 1]);//当前的页面(current page number)
@@ -318,27 +359,53 @@ const onSubmit = () => {
   // console.log(form)
   const order = { ...form };
   console.log(order)
-  request({
-    method: "post",
-    data: order,
-    url: api.ORDERUPDATE
-  }).then(res => {
-    dialogVisible.value = false;
-    //在页面更新
-    tableData.forEach((item, index) => {
-      if (tableData[index].order_id == form.order_id) {
-        tableData[index].contacts = form.contacts;//联系人
-        tableData[index].phone = form.phone; //手机
-        tableData[index].address = form.address;//地址
-        tableData[index].exp_id = form.exp_id;//快递号
-        tableData[index].state = form.state; //状态
-      }
+  //if status is wait ,we only doing change status to the sign 
+  if (choose_status === 'wait') {
+    order.state = 'sign';
+    request({
+      method: "post",
+      data: order,
+      url: api.ORDERUPDATE
+    }).then(res => {
+      dialogVisible.value = false;
+      //在页面更新
+      tableData.forEach((item, index) => {
+        if (tableData[index].order_id == form.order_id) {
+          tableData[index].contacts = form.contacts;//联系人
+          tableData[index].phone = form.phone; //手机
+          tableData[index].address = form.address;//地址
+          tableData[index].exp_id = form.exp_id;//快递号
+          tableData[index].state = form.state; //状态
+        }
+      })
+      console.log(res)
+    }).catch(err => {
+      console.log(err)
     })
+  }else if(choose_status === 'sign' || choose_status === 'refund'){
+    //if status is the sign ,we only modified user information,don't to do more;
+    request({
+      method: "post",
+      data: order,
+      url: api.ORDERUPDATE
+    }).then(res => {
+      dialogVisible.value = false;
+      //在页面更新
+      tableData.forEach((item, index) => {
+        if (tableData[index].order_id == form.order_id) {
+          tableData[index].contacts = form.contacts;//联系人
+          tableData[index].phone = form.phone; //手机
+          tableData[index].address = form.address;//地址
+          tableData[index].exp_id = form.exp_id;//快递号
+          tableData[index].state = form.state; //状态
+        }
+      })
+      console.log(res)
+    }).catch(err => {
+      console.log(err)
+    })
+  }
 
-    console.log(res)
-  }).catch(err => {
-    console.log(err)
-  })
 }
 //详细的列表清单
 const detail_arr = reactive<DetailList[]>([]);
@@ -381,8 +448,8 @@ const handleEdit = (index: number, row: OrderList) => {
     // console.log(detail_arr)
     detail_arr.forEach(async (item, index) => {
       await request(api.PRODUCTINFO + `?pdId=${detail_arr[index].pd_id}`).then(res => {
-        // console.log(res)
-        const data = res.data.data as ProductList;
+        console.log('i am is ', res)
+        const data = res.data.data.product as ProductList;
         detail_arr[index].url = "http://localhost:8080/upload/" + data.picture_name; //url地址
         detail_arr[index].describe = data.p_describe;
       })
@@ -411,15 +478,15 @@ const handleDelete = (index: number, row: OrderList) => {
   console.log(index, row)
 }
 
-const handleClose = (done: () => void) => {
-  ElMessageBox.confirm('Are you sure to close this dialog?')
-    .then(() => {
-      done()
-    })
-    .catch(() => {
-      // catch error
-    })
-}
+// const handleClose = (done: () => void) => {
+//   ElMessageBox.confirm('Are you sure to close this dialog?')
+//     .then(() => {
+//       done()
+//     })
+//     .catch(() => {
+//       // catch error
+//     })
+// }
 
 
 /**

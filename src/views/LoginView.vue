@@ -6,7 +6,7 @@ import { reactive } from 'vue'
 import { useRouter } from "vue-router"
 import { useOnlogin } from "../stores/index"
 import { ElMessage } from 'element-plus'
-import type { Result } from '@/typemanual/typemian';
+import type { LoginInfo, Result } from '@/typemanual/typemian';
 import type { AxiosResponse } from 'axios';
 const account_msg = reactive({
     phone: "",
@@ -14,29 +14,34 @@ const account_msg = reactive({
 })
 const OnLogin = useOnlogin();
 const router = useRouter();
+//初始化的时候将localstorage的token赋给storage
+const determineToken = localStorage.getItem("token")
+if(determineToken){
+    OnLogin.setToken(determineToken)
+} 
+
 function onSubmit() {
     const data = {
         phone: account_msg.phone,
-        m_pwd: account_msg.m_pwd
+        user_pwd: account_msg.m_pwd
     }
     request({
         method: 'post',
-        url: API.LOGIN,
+        url: "/api/login",
         data
-    }).then((res: AxiosResponse<Result>) => {
+    }).then((res: AxiosResponse<LoginInfo>) => {
         // console.log(res.code)
-        console.log(res.data.data);
+        console.log(res.data);
         if (res.data.code == "1") {
-            OnLogin.setToken(res.data.data as string)
-            // OnLogin.setUserName("admin")
-            request({
-                url:"/api/administrator/info"
-            }).then(res=>{
-                const {entry_time,gender,name,phone} =  res.data.data;
-                OnLogin.setUserName(name);
-                OnLogin.setSrc(phone)
-            })
-            router.push('/home')
+            OnLogin.setToken(res.data.data.token as string)
+            OnLogin.setUserInfo(res.data.data.user)
+            //take userInfo to localStorage
+            localStorage.setItem("userInfo",JSON.stringify(res.data.data.user))
+            if(res.data.data.user.roles.includes("admin")){
+                router.push("/home")
+            }else{
+                ElMessage.error("该账号无法登录该系统")
+            }
         } else {
             //this tips login error information 
             if (res.data.msg != null) {

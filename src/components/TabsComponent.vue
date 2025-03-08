@@ -45,7 +45,8 @@ const getRoute = (e: string, index: number) => {
 
 const closeRouter = (e: string) => {
   // console.log('test1', e)
-  tabs.removeMeta(e, router)
+  console.log("close tab",e)
+  tabs.removeMeta(e)
 }
 
 onMounted(() => {

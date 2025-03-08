@@ -5,7 +5,8 @@ export const useOnlogin = defineStore('login',{
         token : "",
         counter : 0,
         userName : "",
-        src :""
+        src :"",
+        userInfo:null as null | any
       }
     },
     getters : {
@@ -20,6 +21,9 @@ export const useOnlogin = defineStore('login',{
       },
       getSrc(state):string{
         return state.src;
+      },
+      getUserInfo(state){
+        return state.userInfo;
       }
     },
     //可以做同步异步操作
@@ -42,6 +46,9 @@ export const useOnlogin = defineStore('login',{
         },
         setSrc(link:string){
           this.src = link;
+        },
+        setUserInfo(info:any){
+          this.userInfo = info;
         }
         
     }

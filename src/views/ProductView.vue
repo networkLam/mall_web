@@ -14,13 +14,18 @@
           <el-image style="width: 100px; height: 100px" :src="scope.row.picture_name" :fit="fits[0]" />
         </template>
       </el-table-column>
-      <el-table-column prop="time" label="入库日期" width="180" />
+      <el-table-column prop="time" label="入库日期" width="180">
+        <template #default="scope">
+          {{ dayjs(scope.row.time).format("YYYY-MM-DD HH:mm:ss") }}
+        </template>
+      </el-table-column>
+
       <el-table-column prop="p_name" label="名称" width="180" />
       <el-table-column prop="price" label="价格" width="180" />
       <el-table-column prop="state" label="状态" width="180">
         <template #default="scope">
           <el-tag :type="scope.row.state === '上架' ? 'success' : 'danger'" disable-transitions>{{ scope.row.state
-            }}</el-tag>
+          }}</el-tag>
         </template>
       </el-table-column>
       <el-table-column prop="p_describe" label="描述" width="280" />
@@ -61,8 +66,14 @@
             <el-option label="下架" value="下架" />
           </el-select>
         </el-form-item>
-
-        <el-form-item label="图片">
+        <el-form-item label="商品分类">
+            <el-select v-model="form.pd_type" placeholder="请选择分类">
+              <el-option label="3C数码" value="3C数码" />
+              <el-option label="美妆服饰" value="美妆服饰" />
+              <el-option label="生鲜" value="生鲜" />
+            </el-select>
+          </el-form-item>
+        <el-form-item label="主图">
           <el-upload v-model:file-list="single_file" action="/api/upload" name="myFile" :on-success="uploadSuccess"
             list-type="picture" :on-preview="handlePictureCardPreview" :on-remove="handleRemove">
             <el-icon>
@@ -102,28 +113,24 @@
 
         <el-form-item>
           <el-button type="primary" @click="onSubmit">确定</el-button>
-          <el-button>取消</el-button>
+          <el-button @click="showTable = false">取消</el-button>
         </el-form-item>
       </el-form>
-    </el-dialog>   
+    </el-dialog>
     <!-- 表单结束 -->
-<!-- 确认删除的弹窗 -->
-    <el-dialog
-    v-model="confirm_dialog"
-    title="警告"
-    width="500"
-  >
-    <span>确认删除吗？</span>
-    <template #footer>
-      <div class="dialog-footer">
-        <el-button @click="confirm_dialog = false">取消</el-button>
-        <el-button type="primary" @click="delete_func">
-          确认
-        </el-button>
-      </div>
-    </template>
-  </el-dialog>
- 
+    <!-- 确认删除的弹窗 -->
+    <el-dialog v-model="confirm_dialog" title="警告" width="500">
+      <span>确认删除吗？</span>
+      <template #footer>
+        <div class="dialog-footer">
+          <el-button @click="confirm_dialog = false">取消</el-button>
+          <el-button type="primary" @click="delete_func">
+            确认
+          </el-button>
+        </div>
+      </template>
+    </el-dialog>
+
   </div>
 </template>
 
@@ -135,10 +142,10 @@ import { Search, Plus } from '@element-plus/icons-vue'
 import { ref, reactive, onMounted, watch, onBeforeMount } from 'vue';
 import request from '@/utils/request';
 import api from "@/utils/api";
-import { useRoute,useRouter } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { useNavigationTab } from "../stores/navigation"
 import { navigationTo } from '@/utils/navigation';
-import dayjs, { Dayjs } from 'dayjs';
+import dayjs from 'dayjs';
 const tabs = useNavigationTab();
 const router = useRouter();
 
@@ -188,7 +195,7 @@ const form = reactive<UserEditForm>({
   p_describe: '',
   picture_name: '',
   pd_type: '',
-  time: ""
+  time: "",
 })
 
 // 编辑框里面的图片
@@ -230,7 +237,7 @@ watch(currentPage, (newVal, oldVal) => {
     tableData.length = 0;
     data.forEach((item, index) => {
       data[index].picture_name = "http://localhost:8080/upload/" + data[index].picture_name;
-      data[index].time = dayjs(data[index].time).format("YYYY-MM-DD HH:mm");
+      // data[index].time = dayjs(data[index].time).format("YYYY-MM-DD HH:mm");
       // console.log(data[index].time)
       tableData[index] = data[index];
     })
@@ -245,7 +252,7 @@ const handleEdit = (index: any, row: any) => {
   form.pd_type = tableData[index].pd_type; //类型
   form.price = tableData[index].price; //价格
   form.state = tableData[index].state;//状态
-  form.pd_id = tableData[index].pd_id//商品id
+  form.pd_id = tableData[index].pd_id;//商品id
   form.picture_name = tableData[index].picture_name //图片链接
   form.time = tableData[index].time;//入库时间
   const obj = reactive({ name: tableData[index].pd_id, url: tableData[index].picture_name })
@@ -256,7 +263,7 @@ const handleEdit = (index: any, row: any) => {
 const detailsDialogVisible = ref(false)
 
 let delete_index = 0;
-let delelte_pd_id:string = '';
+let delelte_pd_id: string = '';
 let confirm_dialog = ref(false) //确认删除展示弹窗
 //详情页面的图片对象
 const details_picture = ref<UploadUserFile[]>([
@@ -268,11 +275,11 @@ const details_picture = ref<UploadUserFile[]>([
 //上传成功后返回的新数据
 const details_picture_new: Array<string> = [];
 
-const delete_func = ()=>{
+const delete_func = () => {
   //真正的删除函数
-  request("/api/product/del?pd_id="+delelte_pd_id).then(res=>{
+  request("/api/admin/product/del?pd_id=" + delelte_pd_id).then(res => {
     console.log(res);
-    tableData.splice(delete_index,1);
+    tableData.splice(delete_index, 1);
     confirm_dialog.value = false;
 
     ElNotification({
@@ -281,6 +288,14 @@ const delete_func = ()=>{
       type: 'success',
     })
 
+  }).catch(err => {
+    console.log(err.response.data);
+    confirm_dialog.value = false;
+    ElNotification({
+      title: '完成',
+      message: err.response.data.data,
+      type: 'error',
+    })
   })
 }
 
@@ -289,10 +304,10 @@ const handleDelete = (index: any, row: any) => {
   console.log(index)
   console.log("delete ?")
   const id = tableData[index].pd_id;
-  delete_index  = index; //获取当前商品的在数组中索引位置
+  delete_index = index; //获取当前商品的在数组中索引位置
   delelte_pd_id = id; //获取删除的商品id
   confirm_dialog.value = true;
-  console.log(delete_index,delelte_pd_id)
+  console.log(delete_index, delelte_pd_id)
   // request("/api/product/del?pd_id="+id).then(res=>{
   //   console.log(res);
   //   tableData.splice(index,1);
@@ -319,7 +334,7 @@ const updatePage = async () => {
     const data: ProductList[] = res.data.data;
     data.forEach((item, index) => {
       data[index].picture_name = "http://localhost:8080/upload/" + data[index].picture_name;
-      data[index].time = dayjs(data[index].time).format("YYYY-MM-DD HH:mm");
+      // data[index].time = dayjs(data[index].time).format("YYYY-MM-DD HH:mm");
       tableData[index] = data[index];
     })
   })
@@ -359,6 +374,11 @@ const onSubmit = () => {
       })
     } else {
       console.log("限制提交")
+      ElNotification({
+        title: '失败',
+        message: '请检查填写内容',
+        type: 'error',
+      })
     }
   } else {
     // console.log("是更新")
@@ -366,7 +386,6 @@ const onSubmit = () => {
       const product = { ...form }
       product.picture_name = product.picture_name.split("/")[4];
       const id = product.pd_id;
-
       request({
         method: "post",
         data: product,
@@ -395,7 +414,13 @@ const onSubmit = () => {
         })
       })
     } else {
-      console.log("限制提交")
+      // console.log("限制提交")
+
+      ElNotification({
+        title: '失败',
+        message: '请检查填写内容',
+        type: 'error',
+      })
     }
   }
 
@@ -404,12 +429,14 @@ const onSubmit = () => {
 //添加
 const addproduct = () => {
   // tabs.navigationTo('/addproduct')
-  // navigationTo('/addproduct');
-  showTable.value = true;
-  (Object.keys(form) as (keyof typeof form)[]).forEach((key) => {
-    form[key] = "";
+  navigationTo('/addproduct',{
+    entry:"add"
   });
-  updateOrInsert.value = false; //是新增
+  // showTable.value = true;
+  // (Object.keys(form) as (keyof typeof form)[]).forEach((key) => {
+  //   form[key] = "";
+  // });
+  // updateOrInsert.value = false; //是新增
 }
 
 
@@ -424,7 +451,7 @@ onBeforeMount(async () => {
     const data: ProductList[] = res.data.data;
     data.forEach((item, index) => {
       data[index].picture_name = "http://localhost:8080/upload/" + data[index].picture_name;
-      data[index].time = dayjs(data[index].time).format("YYYY-MM-DD HH:mm");
+      // data[index].time = dayjs(data[index].time).format("YYYY-MM-DD HH:mm");
       tableData[index] = data[index];
     })
   })
@@ -527,7 +554,7 @@ const confirm_upload = () => {
   pictures.pictures = details_picture_new;
   pictures.pd_id = form.pd_id;
   console.log(pictures)
-  if(!(pictures.pictures.length >= 1)){
+  if (!(pictures.pictures.length >= 1)) {
     //详情图片的长度为0
     ElNotification({
       title: '失败',

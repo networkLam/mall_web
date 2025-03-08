@@ -20,7 +20,7 @@ export interface InfoInf {
 
 export interface Result {
   code: string
-  data: object | string
+  data: User
   msg: string
 }
 //分页查询商品的接口内容
@@ -93,9 +93,35 @@ export interface LogInfoShow {
 }
 //用户信息结构
 export interface User {
-  uid: number
+  id: number
   phone: string
   user_name: string
   gender: string
   register_time: string
+  display: number
+  roles: string
+}
+//用户登录信息
+export interface LoginInfo {
+  code: string
+  data: UserAndToken
+  msg: string
+}
+
+interface UserAndToken {
+  user: User
+  token: string
+}
+//添加商品提交表单的数据接口
+export interface AddProduct{
+  pd_id: null,//商品ID
+  price: string,//商品价格
+  state: string,//商品状态
+  p_name: string,//商品名称
+  p_describe: string,//商品描述
+  picture_name: string, //商品首页展示的图片名
+  pd_type: string,//产品的类型
+  time: string, //修改or添加的时间
+  number: string,//商品的数量
+  picture_detail: string[] 
 }

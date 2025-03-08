@@ -8,11 +8,17 @@ import { useRoute, useRouter, type RouteRecordRaw } from "vue-router"
 import { ref, watch, type Ref } from 'vue'
 import { useNavigationTab } from '@/stores/navigation';
 import router from '../router/index'
-const userName = useOnlogin().getUserName;
+let userName = useOnlogin().getUserInfo;
+// console.log("112", userName)
+if (!userName) {
+  userName = JSON.parse(localStorage.getItem("userInfo") as string).user_name;
+} else {
+  userName = userName.user_name;
+}
 const Link = useOnlogin().getSrc;
-console.log(Link)
+// console.log(Link)
 const Router = useRouter();
-const route = useRoute();
+// const route = useRoute();
 // route.push("/central")
 // console.log("%centry home page", "color:red;")
 //将路由信息初始化
@@ -74,9 +80,7 @@ tabs.setRouter(Router);
         <tabsComponent :items="tabs.getNavigationInfo"></tabsComponent>
         <router-view v-slot="{ Component }">
           <keep-alive>
-            <Transition>
-              <component :is="Component" :key="route.path" />
-            </Transition>
+            <component :is="Component" />
           </keep-alive>
         </router-view>
       </div>

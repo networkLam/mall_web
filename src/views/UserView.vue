@@ -68,11 +68,13 @@ const formLabelWidth = '140px'
 const tableData = reactive<User[]>([])
 //表单的数据
 const form = reactive<User>({
-    uid: 0,
+    id: 0,
     phone: '',
     user_name: '',
     gender: '',
-    register_time: ''
+    register_time: '',
+    display: 0,
+    roles: ''
 })
 //这些函数要改（认知的局限性导致的  
 const init = () => {
@@ -121,7 +123,7 @@ const handleEdit = (index: number, row: User) => {
     form.gender = tableData[index].gender;
     form.phone = tableData[index].phone;
     form.register_time = tableData[index].register_time;
-    form.uid = tableData[index].uid;
+    form.id = tableData[index].id;
     form.user_name = tableData[index].user_name;
     dialogFormVisible.value = true;
 }
@@ -129,10 +131,10 @@ const handleEdit = (index: number, row: User) => {
 const onSubmit = () => {
     // console.log("提交表单")
     // console.log(form)
-    const { uid } = form;
+    const { id } = form;
     const { user_name } = form;
     // console.log(uid, user_name)
-    const user = { uid, user_name };
+    const user = { id, user_name };
     request({
         method: "post",
         url: api.UPDATEUSERNAME,
@@ -141,7 +143,7 @@ const onSubmit = () => {
         // console.log(res)
         //在本地更新用户信息
         tableData.forEach((item, index) => {
-            if (item.uid == uid) {
+            if (item.id == id) {
                 item.user_name = user_name;
                 return;
             }
@@ -160,7 +162,7 @@ const handleDelete = (index: number, row: User) => {
             type: 'warning',
         }
     ).then(() => {
-        const uid = tableData[index].uid;
+        const uid = tableData[index].id;
         console.log(uid);
         request('/api/user/hide?uid=' + uid).then(res => {
             // console.log(res)
@@ -186,7 +188,7 @@ const handleRestPWD = (index: number, row: User) => {
     )
         .then(() => {
             // console.log('重置用户密码')
-            const uid = tableData[index].uid;
+            const uid = tableData[index].id;
             request(api.RESTUSERPWD + uid).then(res => {
                 console.log(res)
                 if (res.data.code == 1) {
