@@ -360,7 +360,7 @@ const onSubmit = () => {
   const order = { ...form };
   console.log(order)
   //if status is wait ,we only doing change status to the sign 
-  if (choose_status === 'wait') {
+  if (choose_status.value === 'wait') {
     order.state = 'sign';
     request({
       method: "post",
@@ -382,7 +382,7 @@ const onSubmit = () => {
     }).catch(err => {
       console.log(err)
     })
-  }else if(choose_status === 'sign' || choose_status === 'refund'){
+  }else if(choose_status.value === 'sign' || choose_status.value === 'refund'){
     //if status is the sign ,we only modified user information,don't to do more;
     request({
       method: "post",
@@ -497,7 +497,7 @@ const route = useRoute();
 * 路由实例
 */
 const router = useRouter();
-let choose_status = "wait"
+let choose_status = ref("wait")
 let offset = 0;
 //获取一共有多少条数据
 const getTotal = async (status: string) => {
@@ -555,23 +555,23 @@ const handleClick = (tab: TabsPaneContext, event: Event) => {
   if (tab.props.name == "wait") {
     currentPage.value = 1;
     ViewInit("wait", 0);
-    choose_status = "wait";
+    choose_status.value = "wait";
     console.log("choose wait")
   } else if (tab.props.name == "sign") {
     currentPage.value = 1;
     ViewInit("sign", 0);
-    choose_status = "sign";
+    choose_status.value = "sign";
     console.log(tableData)
     console.log("choose sign")
   } else if (tab.props.name == "refund") {
     currentPage.value = 1;
     ViewInit("refund", 0);
-    choose_status = "refund";
+    choose_status.value = "refund";
     console.log("choose refund")
   } else {
     currentPage.value = 1;
     ViewInit("finish", 0);
-    choose_status = "finish";
+    choose_status.value = "finish";
     console.log("choose finish")
   }
 
