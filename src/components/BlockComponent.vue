@@ -3,7 +3,7 @@
         <div style="margin-right: 85px;">
             <div class="title">{{ title }}</div>
             <div class="number">{{ now }}</div>
-            <div class="yesterday">昨天&nbsp;&nbsp;<span>{{ yesterday }}</span>&nbsp;<span>{{ percent }}</span> </div>
+            <div class="yesterday">昨天&nbsp;&nbsp;<span>{{ yesterday }}</span>&nbsp;<span>{{ percent +'%'}}</span> </div>
         </div>
         <div class="icon">
             <div>

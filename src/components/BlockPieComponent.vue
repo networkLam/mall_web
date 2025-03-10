@@ -7,58 +7,57 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted, watchEffect, computed } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
+import { ref, reactive, onMounted, watchEffect, computed, watch } from 'vue';
 import * as echarts from 'echarts';
 type EChartsOption = echarts.EChartsOption;
-let option:EChartsOption;
 
-option = {
-    tooltip: {
-        trigger: 'item'
-    },
-    legend: {
-        orient: "horizontal",
-        bottom: '10%'
-    },
-    series: [
-        {
-            name: 'Access From',
-            type: 'pie',
-            radius: '50%',
-            data: [
-                { value: 1048, name: '在售' },
-                { value: 735, name: '下架' },
-            
-            ],
-            emphasis: {
-                itemStyle: {
-                    shadowBlur: 10,
-                    shadowOffsetX: 0,
-                    shadowColor: 'rgba(0, 0, 0, 0.5)'
+interface Props {
+    onSales: number,
+    notSales: number
+}
+const props = defineProps<Props>();
+let chartsInstance: any = null;
+watch([() => props.onSales, () => props.notSales], () => {
+    updateChart();
+})
+
+const updateChart = () => {
+    if (chartsInstance === null) return;
+    let option: EChartsOption = {
+        tooltip: {
+            trigger: 'item'
+        },
+        legend: {
+            orient: "horizontal",
+            bottom: '10%'
+        },
+        series: [
+            {
+                name: '商品数据',
+                type: 'pie',
+                radius: '50%',
+                data: [
+                    { value: props.onSales, name: '在售' },
+                    { value: props.notSales, name: '下架' },
+                ],
+                emphasis: {
+                    itemStyle: {
+                        shadowBlur: 10,
+                        shadowOffsetX: 0,
+                        shadowColor: 'rgba(0, 0, 0, 0.5)'
+                    }
                 }
             }
-        }
-    ]
-};
-
-
-/**
-* 路由对象
-*/
-const route = useRoute();
-/**
-* 路由实例
-*/
-const router = useRouter();
+        ]
+    };
+    chartsInstance.setOption(option);
+}
 onMounted(() => {
     //console.log('3.-组件挂载到页面之后执行-------onMounted')
     var chartDom = document.getElementById('main')!;
-    var myChart = echarts.init(chartDom);
-
-    option && myChart.setOption(option);
-})
-watchEffect(() => {
+    chartsInstance = echarts.init(chartDom);
+    updateChart();
+    // option && myChart.setOption(option);
 })
 
 </script>

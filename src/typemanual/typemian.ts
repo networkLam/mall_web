@@ -113,15 +113,35 @@ interface UserAndToken {
   token: string
 }
 //添加商品提交表单的数据接口
-export interface AddProduct{
-  pd_id: null,//商品ID
-  price: string,//商品价格
-  state: string,//商品状态
-  p_name: string,//商品名称
-  p_describe: string,//商品描述
-  picture_name: string, //商品首页展示的图片名
-  pd_type: string,//产品的类型
-  time: string, //修改or添加的时间
-  number: string,//商品的数量
-  picture_detail: string[] 
+export interface AddProduct {
+  pd_id: null //商品ID
+  price: string //商品价格
+  state: string //商品状态
+  p_name: string //商品名称
+  p_describe: string //商品描述
+  picture_name: string //商品首页展示的图片名
+  pd_type: string //产品的类型
+  time: string //修改or添加的时间
+  number: string //商品的数量
+  picture_detail: string[]
+}
+
+//panel data
+export interface PanelData {
+  todaySale: number
+  yesterdaySale: number
+  todayOrder: number
+  yesterdayOrder: number
+  todayRefund: number
+  yesterdayRefund: number
+  todayNewUser: number
+  yesterdayUser: number
+  last7SalesVolume: {
+    volume: number[]
+    dates: string[]
+  }
+  productState: {
+    onSales: number
+    NotSales: number
+  }
 }
