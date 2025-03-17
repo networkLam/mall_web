@@ -22,17 +22,20 @@
 
       <el-table-column prop="p_name" label="名称" width="180" />
       <el-table-column prop="price" label="价格" width="180" />
-      <el-table-column prop="state" label="状态" width="180">
+      <el-table-column prop="state" label="状态" width="80">
         <template #default="scope">
           <el-tag :type="scope.row.state === '上架' ? 'success' : 'danger'" disable-transitions>{{ scope.row.state
           }}</el-tag>
         </template>
       </el-table-column>
       <el-table-column prop="p_describe" label="描述" width="280" />
-      <el-table-column align="right" label="编辑" width="180">
+      <el-table-column align="right" label="操作" width="220">
         <template #default="scope">
           <el-button size="small" @click="handleEdit(scope.$index, scope.row)">
             编辑
+          </el-button>
+          <el-button size="small" @click="viewComment(scope.$index, scope.row)">
+            查看评价
           </el-button>
           <el-button size="small" type="danger" @click="handleDelete(scope.$index, scope.row)">
             删除
@@ -67,12 +70,12 @@
           </el-select>
         </el-form-item>
         <el-form-item label="商品分类">
-            <el-select v-model="form.pd_type" placeholder="请选择分类">
-              <el-option label="3C数码" value="3C数码" />
-              <el-option label="美妆服饰" value="美妆服饰" />
-              <el-option label="生鲜" value="生鲜" />
-            </el-select>
-          </el-form-item>
+          <el-select v-model="form.pd_type" placeholder="请选择分类">
+            <el-option label="3C数码" value="3C数码" />
+            <el-option label="美妆服饰" value="美妆服饰" />
+            <el-option label="生鲜" value="生鲜" />
+          </el-select>
+        </el-form-item>
         <el-form-item label="主图">
           <el-upload v-model:file-list="single_file" action="/api/upload" name="myFile" :on-success="uploadSuccess"
             list-type="picture" :on-preview="handlePictureCardPreview" :on-remove="handleRemove">
@@ -130,14 +133,24 @@
         </div>
       </template>
     </el-dialog>
-
+    <!-- 查看评价的弹框 -->
+    <el-dialog v-model="dialogOfReview" title="评价" width="30%" @close="resetData">
+      <div class="rate">
+        <el-rate v-model="score" disabled show-score text-color="#ff9900" score-template="{value}" />
+      </div>
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button @click="dialogOfReview = false">取消</el-button>
+        </span>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
 <script lang="ts" setup>
 import type { ImageProps, UploadProps, UploadUserFile } from 'element-plus'
-import type { ProductList, UserEditForm, PictureDetail } from "@/typemanual/typemian"
-import { ElNotification } from 'element-plus'
+import type { ProductList, UserEditForm, PictureDetail, ViewComment } from "@/typemanual/typemian"
+import { ElNotification, ElMessage } from 'element-plus'
 import { Search, Plus } from '@element-plus/icons-vue'
 import { ref, reactive, onMounted, watch, onBeforeMount } from 'vue';
 import request from '@/utils/request';
@@ -146,6 +159,32 @@ import { useRoute, useRouter } from 'vue-router';
 import { useNavigationTab } from "../stores/navigation"
 import { navigationTo } from '@/utils/navigation';
 import dayjs from 'dayjs';
+//查看评价模块代码
+const dialogOfReview = ref(false);
+const score = ref(0);
+const viewComment = (index: any, row: any) => {
+  console.log(row)
+  request({
+    url: `/api/admin/retrieveComment?pdId=${row.pd_id}&offset=1`,
+    method: "post"
+  }).then(res => {
+    // console.log(res)
+    const { data }: { data: ViewComment } = res;
+    dialogOfReview.value = true
+    if (data.code == '0') {
+      ElMessage.error('暂无评论');
+      return;
+    }
+    console.log(data.data)
+    score.value = data.data.stars;
+  })
+}
+//重置数据 当查看评价的弹框关闭时
+const resetData = () => {
+  score.value = 0;
+}
+
+
 const tabs = useNavigationTab();
 const router = useRouter();
 
@@ -429,8 +468,8 @@ const onSubmit = () => {
 //添加
 const addproduct = () => {
   // tabs.navigationTo('/addproduct')
-  navigationTo('/addproduct',{
-    entry:"add"
+  navigationTo('/addproduct', {
+    entry: "add"
   });
   // showTable.value = true;
   // (Object.keys(form) as (keyof typeof form)[]).forEach((key) => {

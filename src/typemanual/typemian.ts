@@ -145,3 +145,20 @@ export interface PanelData {
     NotSales: number
   }
 }
+
+interface Comment {
+  comment: string
+  gender: string
+  images: string[]
+  publishDate: string
+  userName: string
+}
+//查看评价的数据结构
+export interface ViewComment {
+  code: '0' | '1'
+  data: {
+    stars: number
+    commentList: Comment[]
+  }
+  msg: string
+}
