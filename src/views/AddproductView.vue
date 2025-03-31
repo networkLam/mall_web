@@ -109,8 +109,6 @@ onActivated(() => {
 
 const onSubmit = () => {
   console.log('submit!')
-  // console.log("文件列表",fileListMain)
-  // console.log("details picture",fileListLoopPicture)
   if (fileListMain.value.length && typeof fileListMain.value[0].response === 'string') {
     const fileName = fileListMain.value[0].response.split("/");
     addForm.picture_name = fileName[fileName.length - 1];
@@ -118,7 +116,6 @@ const onSubmit = () => {
   const arr: string[] = [];
   console.log("fileListLoopPicture", fileListLoopPicture.value)
   for (const item of fileListLoopPicture.value) {
-    // console.log(item.response)
     if (typeof item.response === 'string') {
       const fileName = item.response.split("/")
       arr.push(fileName[fileName.length - 1])

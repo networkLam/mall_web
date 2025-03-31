@@ -35,7 +35,7 @@
             编辑
           </el-button>
           <el-button size="small" @click="viewComment(scope.$index, scope.row)">
-            查看评价
+            查看评分
           </el-button>
           <el-button size="small" type="danger" @click="handleDelete(scope.$index, scope.row)">
             删除
@@ -140,7 +140,7 @@
       </div>
       <template #footer>
         <span class="dialog-footer">
-          <el-button @click="dialogOfReview = false">取消</el-button>
+          <el-button @click="dialogOfReview = false">关闭</el-button>
         </span>
       </template>
     </el-dialog>

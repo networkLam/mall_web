@@ -28,7 +28,7 @@ const cancel = ()=>{
                 icon-color="#626AEF"
                 title="确定退出登录吗?" >
                         <template #reference>
-                        <div style="font-weight: 500;">退出</div>
+                        <div style="font-weight: 500;cursor: pointer;">退出</div>
                         </template>
                 </el-popconfirm>
                 </div>
