@@ -34,7 +34,7 @@ const router = createRouter({
           path: '/central',
           name: 'central',
           meta: {
-            title: '控制面板',
+            title: '数据面板',
             show:true //将不展示在主菜单；
           },
           // route level code-splitting

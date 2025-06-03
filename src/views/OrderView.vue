@@ -538,7 +538,7 @@ watch(currentPage, () => {
   } else {
     offset = (currentPage.value - 1) * 10;
   }
-  request(api.ORDERLIST + `?status=${choose_status}&offset=${offset}`).then(res => {
+  request(api.ORDERLIST + `?status=${choose_status.value}&offset=${offset}`).then(res => {
     const data = res.data.data as OrderList[];
     tableData.length = 0;
     data.forEach((item, index) => {

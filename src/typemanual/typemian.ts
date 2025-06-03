@@ -44,6 +44,7 @@ export interface UserEditForm {
   picture_name: string
   pd_type: string
   time: string
+  number:number
 }
 
 //详情图片返回的数据

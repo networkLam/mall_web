@@ -75,7 +75,7 @@ export const useNavigationTab = defineStore('navigation', {
       // console.log('allRouterInfo', this.allRouterInfo)
     },
     //路由导航
-    navigationTo(destination: string, query: {}) {
+    navigationTo(destination: string, query: {}={}) {
       const routeLocal = this.allRouterInfo.findIndex((item: any) => item.path === destination)
       //先把内容的组装
       this.routeChange(this.allRouterInfo[routeLocal], query)

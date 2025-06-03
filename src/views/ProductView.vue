@@ -63,6 +63,9 @@
         <el-form-item label="商品价格">
           <el-input v-model="form.price" />
         </el-form-item>
+        <el-form-item label="商品库存">
+          <el-input v-model="form.number" />
+        </el-form-item>
         <el-form-item label="上架状态">
           <el-select v-model="form.state" placeholder="请选择商品的状态">
             <el-option label="上架" value="上架" />
@@ -172,7 +175,7 @@ const viewComment = (index: any, row: any) => {
     const { data }: { data: ViewComment } = res;
     dialogOfReview.value = true
     if (data.code == '0') {
-      ElMessage.error('暂无评论');
+      ElMessage.error('暂无评分');
       return;
     }
     console.log(data.data)
@@ -235,6 +238,7 @@ const form = reactive<UserEditForm>({
   picture_name: '',
   pd_type: '',
   time: "",
+  number:0,
 })
 
 // 编辑框里面的图片
@@ -285,6 +289,7 @@ watch(currentPage, (newVal, oldVal) => {
 
 //编辑函数
 const handleEdit = (index: any, row: any) => {
+  console.log(row);
   showTable.value = true
   form.p_describe = tableData[index].p_describe; //描述
   form.p_name = tableData[index].p_name; //名称
@@ -294,6 +299,7 @@ const handleEdit = (index: any, row: any) => {
   form.pd_id = tableData[index].pd_id;//商品id
   form.picture_name = tableData[index].picture_name //图片链接
   form.time = tableData[index].time;//入库时间
+  form.number = row.number;
   const obj = reactive({ name: tableData[index].pd_id, url: tableData[index].picture_name })
   single_file.value.push(obj)
   updateOrInsert.value = true; // 是更新
@@ -496,10 +502,10 @@ onBeforeMount(async () => {
   })
 })
 
-onMounted(() => {
-  //console.log('3.-组件挂载到页面之后执行-------onMounted')
+// onMounted(() => {
+//   //console.log('3.-组件挂载到页面之后执行-------onMounted')
 
-})
+// })
 
 
 //关闭弹窗的函数(关闭弹窗时把图片数组中的数据清空)
